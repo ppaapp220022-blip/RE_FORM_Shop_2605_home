@@ -171,7 +171,7 @@ CREATE TABLE manner_review
 ) ENGINE = InnoDB;
 
 
--- 10. 채팅방 로그
+-- 10. 채팅방 로그 0
 -- PK : chat_id   |  FK : trade_id, buyer_id, seller_id
 -- IDX : buyer_id, seller_id
 CREATE TABLE chat_room
@@ -189,7 +189,7 @@ CREATE TABLE chat_room
 ) ENGINE = InnoDB;
 
 
--- 11. 결제 기록
+-- 11. 결제 기록 0
 -- PK : payment_id   |  FK : trade_id
 CREATE TABLE payment
 (
@@ -208,7 +208,7 @@ CREATE TABLE payment
 ) ENGINE = InnoDB;
 
 
--- 12. 토스 로그 기록 (append-only)
+-- 12. 토스 로그 기록 (append-only) 0
 -- PK : log_id   |  FK : payment_id
 CREATE TABLE toss_log
 (
@@ -221,7 +221,7 @@ CREATE TABLE toss_log
 ) ENGINE = InnoDB;
 
 
--- 13. 회원별 출금 포인트 조회
+-- 13. 회원별 출금 포인트 조회 0
 -- PK : wallet_id   |  FK : member_id
 CREATE TABLE point_wallet
 (
@@ -235,7 +235,7 @@ CREATE TABLE point_wallet
 ) ENGINE = InnoDB;
 
 
--- 14. 회원별 출금 포인트 변동 내역
+-- 14. 회원별 출금 포인트 변동 내역 0
 -- PK : point_id   |  FK : wallet_id, trade_id
 -- IDX : wallet_id, trade_id
 CREATE TABLE point_history
@@ -254,7 +254,7 @@ CREATE TABLE point_history
 ) ENGINE = InnoDB;
 
 
--- 15. 포인트 현금화 요청 목록
+-- 15. 포인트 현금화 요청 목록 0
 -- PK : withdraw_id   |  FK : member_id
 -- IDX : member_id, status
 CREATE TABLE point_request
@@ -273,7 +273,7 @@ CREATE TABLE point_request
 ) ENGINE = InnoDB;
 
 
--- 16. 커뮤니티 글 목록
+-- 16. 커뮤니티 글 목록 0
 -- PK : comm_id   |  FK : member_id
 -- 거래 매물 게시글 필드와 구분짓기 위해 중복된 필드명은 앞에 comm_ 붙여 구분했습니다
 CREATE TABLE community_post
@@ -295,7 +295,7 @@ CREATE TABLE community_post
 ) ENGINE = InnoDB;
 
 
--- 17. 댓글 목록
+-- 17. 댓글 목록 0
 -- PK : reply_id   |  FK : post_id, member_id, parent_id
 -- IDX : post_id, member_id, parent_id
 CREATE TABLE reply
@@ -317,7 +317,7 @@ CREATE TABLE reply
 ) ENGINE = InnoDB;
 
 
--- 18. 회원별 출금 포인트 조회
+-- 18. 회원별 출금 포인트 조회 0
 -- PK : point_id   |  FK : reporter_id
 -- IDX : reporter_id, target_type + target_id
 CREATE TABLE report
@@ -336,7 +336,7 @@ CREATE TABLE report
 ) ENGINE = InnoDB;
 
 
--- 19. 알림 목록
+-- 19. 알림 목록 0
 -- PK : noti_id   |  FK : member_id
 -- IDX : member_id, type
 CREATE TABLE notification
@@ -358,13 +358,13 @@ CREATE TABLE notification
 -- PK : point_id   |  FK : member_id
 -- IDX : target_type + target_id
 # CREATE TABLE risk_analysis_result
-      # (
-            #     risk_id     BIGINT PRIMARY KEY          NOT NULL AUTO_INCREMENT,
-            #     target_type ENUM ('POST', 'CHAT')       NOT NULL COMMENT '감지된 대상 분류',
-    #     target_id   BIGINT                      NOT NULL COMMENT '대상 ID',
-    #     risk_level  ENUM ('LOW', 'MID', 'HIGH') NOT NULL COMMENT '위험 레벨',
-    #     reason      TEXT                        NULL COMMENT '탐지 사유',
-    #     suggestion  TEXT                        NULL COMMENT '개선 제안',
-    #     created_at  DATETIME                    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    #     KEY idx_risk_analysis_target (target_type, target_id)
-    # ) ENGINE = InnoDB;
+# (
+#     risk_id     BIGINT PRIMARY KEY          NOT NULL AUTO_INCREMENT,
+#     target_type ENUM ('POST', 'CHAT')       NOT NULL COMMENT '감지된 대상 분류',
+#     target_id   BIGINT                      NOT NULL COMMENT '대상 ID',
+#     risk_level  ENUM ('LOW', 'MID', 'HIGH') NOT NULL COMMENT '위험 레벨',
+#     reason      TEXT                        NULL COMMENT '탐지 사유',
+#     suggestion  TEXT                        NULL COMMENT '개선 제안',
+#     created_at  DATETIME                    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+#     KEY idx_risk_analysis_target (target_type, target_id)
+# ) ENGINE = InnoDB;
