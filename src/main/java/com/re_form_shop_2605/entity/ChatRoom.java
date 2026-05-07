@@ -1,0 +1,28 @@
+package com.re_form_shop_2605.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Getter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class ChatRoom extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long chatId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trade_id", updatable = false)
+    private Trade tradeId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="buyer_id", nullable = false)
+    private Member buyerId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="seller_id", nullable = false)
+    private Member sellerId;
+}
