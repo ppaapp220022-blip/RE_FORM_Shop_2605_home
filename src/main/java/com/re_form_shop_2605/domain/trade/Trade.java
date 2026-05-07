@@ -1,6 +1,5 @@
-package com.re_form_shop_2605.domain;
+package com.re_form_shop_2605.domain.trade;
 
-import com.re_form_shop_2605.entity.Enum.Status;
 import com.re_form_shop_2605.entity.Enum.TradeDeliveryType;
 import com.re_form_shop_2605.entity.Enum.TradeStatus;
 import lombok.*;

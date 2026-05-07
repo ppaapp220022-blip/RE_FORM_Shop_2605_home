@@ -1,5 +1,8 @@
-package com.re_form_shop_2605.entity;
+package com.re_form_shop_2605.entity.chat;
 
+import com.re_form_shop_2605.entity.BaseEntity;
+import com.re_form_shop_2605.entity.member.Member;
+import com.re_form_shop_2605.entity.trade.Trade;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +15,7 @@ import lombok.*;
 public class ChatRoom extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "chat_id", nullable = false)
     private Long chatId;
 
     @ManyToOne(fetch = FetchType.LAZY)

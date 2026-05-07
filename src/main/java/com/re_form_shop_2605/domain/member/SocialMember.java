@@ -1,7 +1,6 @@
-package com.re_form_shop_2605.domain;
+package com.re_form_shop_2605.domain.member;
 
 import com.re_form_shop_2605.entity.Enum.Provider;
-import com.re_form_shop_2605.entity.Member;
 import lombok.*;
 
 @Getter

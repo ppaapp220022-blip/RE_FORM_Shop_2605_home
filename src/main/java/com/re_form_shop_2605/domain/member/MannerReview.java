@@ -1,4 +1,4 @@
-package com.re_form_shop_2605.domain;
+package com.re_form_shop_2605.domain.member;
 
 import lombok.*;
 import org.w3c.dom.Text;

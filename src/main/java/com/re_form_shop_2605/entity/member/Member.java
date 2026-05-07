@@ -1,14 +1,12 @@
-package com.re_form_shop_2605.entity;
+package com.re_form_shop_2605.entity.member;
 
+import com.re_form_shop_2605.entity.BaseEntity;
 import com.re_form_shop_2605.entity.Enum.MemberStatus;
 import com.re_form_shop_2605.entity.Enum.Role;
-import com.re_form_shop_2605.entity.Enum.Status;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.re_form_shop_2605.entity;
+package com.re_form_shop_2605.entity.member;
 
 import com.re_form_shop_2605.entity.Enum.Provider;
 import jakarta.persistence.*;
