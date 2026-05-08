@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "trade")
 public class Trade extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "trade_id", nullable = false)
@@ -72,4 +71,7 @@ public class Trade extends BaseEntity {
     @OneToOne(mappedBy = "trade", fetch = FetchType.LAZY)
     private MannerReview mannerReview;
 
+    public void changeStatus(TradeStatus status) {
+        this.status = status;
+    }
 }

@@ -1,10 +1,23 @@
 package com.re_form_shop_2605.service.payment;
 
+import com.re_form_shop_2605.dto.payment.*;
+import com.re_form_shop_2605.entity.Enum.PaymentStatus;
+import com.re_form_shop_2605.entity.Enum.TradeStatus;
+import com.re_form_shop_2605.entity.payment.Payment;
+import com.re_form_shop_2605.entity.payment.TossLog;
+import com.re_form_shop_2605.entity.trade.Trade;
 import com.re_form_shop_2605.repository.payment.PaymentRepository;
+import com.re_form_shop_2605.repository.payment.TossLogRepository;
 import com.re_form_shop_2605.repository.trade.TradeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -12,17 +25,151 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final TradeRepository tradeRepository;
+    private final TossLogRepository tossLogRepository;
+    private final WebClient tossWebClient;
 
     // 1. 결제 요청
-    // 1) 거래 조회 -> 거래 반환
-    // 2) 요청자가 구매자인지 검증
-    // 3) 거래 상태 검증 (ACCEPTED가 아니면 결제 불가)
-    // 4) 금액 검증 (DB와 비교해 위변조 감지)
-    // 5) tossOrderId 생성 후 저장 => UUID 이용
+    public PaymentInitResponseDTO createPayment(Long buyerId, PaymentInitRequestDTO request) {
+        // 1) 거래 조회 -> 거래 반환
+        Trade trade = tradeRepository.findById(request.tradeId())
+                .orElseThrow(() -> new IllegalArgumentException("createPayment : 존재하지 않는 거래입니다."));
+
+        // 2) 요청자가 구매자인지 검증
+        if (!trade.getBuyer().getMemberId().equals(buyerId)) {
+            throw new IllegalArgumentException("createPayment : 구매자가 아닌 사용자는 결제 권한이 없습니다.");
+        }
+
+        // 3) 거래 상태 검증 (ACCEPTED가 아니면 결제 불가)
+        if (trade.getStatus() != TradeStatus.ACCEPTED) {
+            throw new IllegalArgumentException("createPayment : ACCEPTED 상태가 아닌 거래 건은 결제할 수 없습니다.");
+        }
+
+        // 4) tossOrderId 생성 후 저장 => UUID 이용
+        String tossOrderId = UUID.randomUUID().toString();
+
+        // 5) Payment 생성 및 DB insert
+        Payment payment = Payment.builder()
+                .trade(trade)
+                .payMethod(request.payMethod())
+                .tossOrderId(tossOrderId)
+                .amount(trade.getTradePrice())
+                .status(PaymentStatus.READY)
+                .build();
+        paymentRepository.save(payment);
+
+        // 6) PaymentInitResponseDTO 반환
+        return new PaymentInitResponseDTO(
+                tossOrderId,
+                trade.getPost().getTitle(),
+                trade.getTradePrice()
+        );
+    }
+
 
     // 2. toss 승인 처리 콜백
-    // 1) Toss Payments 결제 결과를 서버로 콜백
-    // 2) 서버가 결재 금액 재검증
-    // 3) 검증 통과 시 토스 승인 api 호출
-    // 4) 거래 상태 전환 및 정보 저장
+    public PaymentResponseDTO confirmPayment(PaymentConfirmRequestDTO request) {
+        // 1) orderId로 payment 조회
+        Payment payment = paymentRepository.findByTossOrderId(request.orderId())
+                .orElseThrow(() -> new IllegalArgumentException("confirmPayment : 존재하지 않는 결제 건입니다."));
+
+        // 2) 금액 검증 (위변조 방지)
+        if (!payment.getAmount().equals(request.amount())) {
+            throw new IllegalArgumentException("confirmPayment : 금액이 불일치합니다.");
+        }
+
+        // 3) 요청 Body 생성 및 토스 승인 API 호출
+        Map<String, Object> tossRequest = new HashMap<>();
+        tossRequest.put("paymentKey", request.paymentKey());
+        tossRequest.put("orderId", request.orderId());
+        tossRequest.put("amount", request.amount());
+
+        // ** post, 응답은 Map 형식으로 받음, 동기 **
+        Map response = null;
+        try { // 결제 성공 시
+            response = tossWebClient.post()
+                    .uri("/v1/payments/confirm")
+                    .bodyValue(tossRequest)
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+        } catch(Exception e) { // 결제 실패 시
+            payment.fail();
+            throw new RuntimeException("토스 결제 승인 실패 : " + e.getMessage());
+        }
+
+        // 4) payment 상태 업데이트 (PAID)
+        String tossPaymentKey = (String) response.get("paymentKey");
+        Map cardInfo = (Map) response.get("card");
+        String approvalNo = cardInfo != null ? (String) cardInfo.get("approveNo") : null;
+        payment.paid(tossPaymentKey, approvalNo);
+
+        // 5) trade 상태 업데이트 (PAID)
+        Trade trade = payment.getTrade();
+        trade.changeStatus(TradeStatus.PAID);
+
+        // 6) toss_log 저장
+        tossLogRepository.save(
+                TossLog.builder()
+                        .payment(payment)
+                        .tossPaymentKey(tossPaymentKey)
+                        .rawResponse(response.toString())
+                        .build()
+        );
+
+        // 7) PaymentResponseDTO 반환
+        return new PaymentResponseDTO(
+                payment.getPaymentId(), trade.getTradeId(),
+                payment.getPayMethod(), payment.getAmount(), payment.getStatus(),
+                payment.getApprovalNo(), payment.getPaidAt()
+        );
+    }
+
+    // 3. 결제 취소
+    // 3-1. toss 결제 취소 api 호출
+    private void callTossCancelAPI(String tossPaymentKey, String cancelReason) {
+        // 1) 요청 Body 생성
+        Map<String, Object> tossCancelRequest = new HashMap<>();
+        tossCancelRequest.put("cancelReason", cancelReason);
+
+        // 2) 토스 취소 API 호출
+        Map response = tossWebClient.post()
+                .uri("/v1/payments/{paymentKey}/cancel", tossPaymentKey)
+                .bodyValue(tossCancelRequest)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
+    }
+
+    // 3-2. 결제 취소 메서드
+    public PaymentResponseDTO cancelPayment(String tossPaymentKey, PaymentCancelRequestDTO request) {
+        // 1) tossPaymentKey로 payment 조회
+        Payment payment = paymentRepository.findByTossPaymentKey(tossPaymentKey)
+                .orElseThrow(() -> new IllegalArgumentException("cancelPayment : 존재하지 않는 tossPaymentKey 입니다."));
+
+        // 2) payment 상태 검증 (PAID 상태만 취소 가능)
+        if (payment.getStatus() != PaymentStatus.PAID) {
+            throw new IllegalArgumentException("cancelPayment : PAID 상태가 아닌 거래 건의 결제를 취소할 수 없습니다.");
+        }
+
+        // 3) cancelType에 따라 payment 상태 변경 : CANCEL  → payment.cancel() / REFUND  → payment.refund()
+        if (request.cancelType().equals("CANCEL")) {
+            payment.cancel();
+        } else if (request.cancelType().equals("REFUND")) {
+            payment.refund();
+        }
+
+        // 4) callTossCancelApi() 호출
+        callTossCancelAPI(tossPaymentKey, request.cancelReason());
+
+        // 5) trade 상태 변경 → CANCELED
+        Trade trade = payment.getTrade();
+        trade.changeStatus(TradeStatus.CANCELED);
+
+        // 6) PaymentResponseDTO 반환
+        return new PaymentResponseDTO(
+                payment.getPaymentId(), trade.getTradeId(),
+                payment.getPayMethod(), payment.getAmount(), payment.getStatus(),
+                payment.getApprovalNo(), payment.getPaidAt()
+        );
+    }
 }

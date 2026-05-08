@@ -1,0 +1,50 @@
+* 토스 서버 요청 도구는 WebClient 사용
+
+-------------------------------------------------------
+* 토스 결제 과정 흐름
+1. 구매자가 토스 결제창에서 결제 진행
+        ↓
+2. 토스가 결제 처리
+        ↓
+3. 토스가 프론트에 결과 전달
+   (성공이면 successUrl, 실패면 failUrl로 이동)
+        ↓
+4. 프론트가 콜백 받아 백엔드에 승인 요청
+   (paymentKey, orderId, amount 전달)
+        ↓
+5. 백엔드가 토스 승인 API 호출
+        ↓
+6. 토스가 최종 승인 완료
+        ↓
+7. 백엔드가 DB 업데이트
+
+
+-------------------------------------------------------
+* 주문 단계 정의
+       java      |      DB       |  description
+  orderRequest   |  REQUESTED    |  구매 요청
+  orderAccepted  |  ACCEPTED     |  요청 승인
+  payReady       |  READY        |  결제 대기
+    payCompleted |  PAID         |  결제 완료
+    payFailed    |  FAILED       |  결제 실패
+    payCanceled  |  CANCELED     |  결제 취소
+    payRefund    |  REFUNDED     |  환불
+    payCompleted |  PAID         |  결제 완료
+  inProgress     |  IN_PROGRESS  |  수령 진행 중
+  confirmed      |  CONFIRMED    |  구매 확정
+  completed      |  COMPLETED    |  거래 완료
+  canceled       |  CANCELED     |  거래 취소
+  disputed       |  DISPUTED     |  분쟁 중
+
+-------------------------------------------------------
+* 결제 시 필요 정보
+tossOrderId          주문번호
+orderName            구매 상품
+customerEmail        구매자 이메일 주소 (결제 상태 알림 전송용)
+customerName         구매자명
+customerMobilePhone  구매자 휴대폰 번호
+customerKey          구매자 구분 키 (UUID 등 무작위성 고유값일 것)
+amount               결제 금액
+
+-------------------------------------------------------
+*

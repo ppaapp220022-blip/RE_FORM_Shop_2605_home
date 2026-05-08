@@ -43,7 +43,7 @@ public class Payment extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private PaymentStatus status; // 결제 上태
+    private PaymentStatus status; // 결제 상태
 
     @Column(name = "paid_at")
     private LocalDateTime paidAt; // 결제 완료 일시
