@@ -20,13 +20,13 @@ public class ChatRoom extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trade_id", updatable = false)
-    private Trade tradeId;
+    private Trade trade;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="buyer_id", nullable = false)
-    private Member buyerId;
+    private Member buyer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="seller_id", nullable = false)
-    private Member sellerId;
+    private Member seller;
 }

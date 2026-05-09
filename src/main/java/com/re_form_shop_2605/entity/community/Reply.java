@@ -20,15 +20,15 @@ public class Reply extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    private Post postId;
+    private CommunityPost communityPost;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member memberId;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
-    private Reply parentId; // 대댓글의 부모 댓글
+    private Reply reply; // 대댓글의 부모 댓글
 
     @Column(columnDefinition = "TEXT")
     private String replyContent; // 댓글 내용

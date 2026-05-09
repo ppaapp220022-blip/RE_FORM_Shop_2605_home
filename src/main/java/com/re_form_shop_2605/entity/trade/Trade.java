@@ -3,12 +3,15 @@ package com.re_form_shop_2605.entity.trade;
 import com.re_form_shop_2605.entity.BaseEntity;
 import com.re_form_shop_2605.entity.Enum.TradeDeliveryType;
 import com.re_form_shop_2605.entity.Enum.TradeStatus;
+import com.re_form_shop_2605.entity.chat.ChatRoom;
 import com.re_form_shop_2605.entity.member.MannerReview;
 import com.re_form_shop_2605.entity.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @ToString
@@ -68,6 +71,10 @@ public class Trade extends BaseEntity {
 
     @Column(name = "confirmed_at")
     private LocalDateTime confirmedAt;
+
+    // 부모
+    @OneToMany(mappedBy = "trade")
+    private List<ChatRoom> chatRooms = new ArrayList<>();
 
     @OneToOne(mappedBy = "trade", fetch = FetchType.LAZY)
     private MannerReview mannerReview;
