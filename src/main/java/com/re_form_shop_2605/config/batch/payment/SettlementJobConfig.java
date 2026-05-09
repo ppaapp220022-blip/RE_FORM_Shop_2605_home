@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Configuration
@@ -37,14 +38,17 @@ public class SettlementJobConfig {
     private static final double COMMISSION_RATE = 0.05; // 수수료
 
     // 1. JOB
+    // 1) 자동 구매 확정 -> 미정산 거래 정산 처리
     @Bean
-    public Job setJob() {
-        return new JobBuilder("setJob", jobRepository)
-                .start(setStep())
+    public Job dailyBatchJob() {
+        return new JobBuilder("dailyBatchJob", jobRepository)
+                .start(autoConfirmStep())
+                .next(setStep())
                 .build();
     }
 
     // 2. Step
+    // 1) 미정산
     @Bean
     public Step setStep() {
         return new StepBuilder("setStep", jobRepository)
@@ -52,6 +56,16 @@ public class SettlementJobConfig {
                 .reader(setUnsettledTradeReader())
                 .processor(setCommissionProcessor())
                 .writer(setProvidePointWriter())
+                .build();
+    }
+
+    // 2) 자동 구매 확정
+    @Bean
+    public Step autoConfirmStep() {
+        return new StepBuilder("autoConfirmStep", jobRepository)
+                .<Trade, Trade>chunk(10, platformTransactionManager)
+                .reader(autoConfirmReader())
+                .writer(autoConfirmWriter())
                 .build();
     }
 
@@ -63,8 +77,16 @@ public class SettlementJobConfig {
         return new ListItemReader<>(trades);
     }
 
+    // 2) 5일 이내 구매 확정 처리되지 않은 거래 조회 : status.trade가 RECEIVED + received_at.trade이 5일 경과
+    @Bean
+    public ItemReader<Trade> autoConfirmReader() {
+        LocalDateTime dueDate = LocalDateTime.now().minusDays(5);
+        List<Trade> trades = tradeRepository.findAutoConfirmTargets(TradeStatus.RECEIVED, dueDate);
+        return new ListItemReader<>(trades);
+    }
+
     // 4. ItemProcessor
-    // 1) 수수료 계산
+    // 1) 미정산 - 수수료 계산
     @Bean
     public ItemProcessor<Trade, SettlementResult> setCommissionProcessor() {
         return trade -> {
@@ -107,6 +129,17 @@ public class SettlementJobConfig {
 
                 // (3) Trade 상태 COMPLETE로 변경
                 result.trade().changeStatus(TradeStatus.COMPLETED);
+            }
+        };
+    }
+
+    // 2) 자동 구매 확정 상태 변경
+    @Bean
+    public ItemWriter<Trade> autoConfirmWriter() {
+        return chunk -> {
+            for (Trade trade : chunk.getItems()) {
+                // (1) 상태 변경
+                trade.changeStatus(TradeStatus.CONFIRMED);
             }
         };
     }

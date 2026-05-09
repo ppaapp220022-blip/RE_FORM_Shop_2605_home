@@ -12,14 +12,16 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BatchScheduler {
     private final JobOperator jobOperator;
-    private final Job setJob; // SettlementJob (정산)
+    private final Job dailyBatchJob; // SettlementJob (정산)
 
-    /* 구매자의 '구매 확정' 시, 판매자 point wallet으로 수수료 제외 포인트 지급 */
+    /* 자동 구매 확정 -> 미정산 거래 정산 처리 */
+    // 1) 5일 경과된 미구매확정 거래 자동 구매확정 처리
+    // 2) 구매자의 '구매 확정' 시, 판매자 point wallet으로 수수료 제외 포인트 지급
     @Scheduled(cron = "0 0 4 * * ?")
-    public void runSettlementJob() throws Exception {
+    public void runDailyBatchJob() throws Exception {
         JobParameters params = new JobParametersBuilder()
                 .addLong("time", System.currentTimeMillis())
                 .toJobParameters();
-        jobOperator.start(setJob, params);
+        jobOperator.start(dailyBatchJob, params);
     }
 }

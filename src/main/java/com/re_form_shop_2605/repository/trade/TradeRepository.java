@@ -5,8 +5,10 @@ import com.re_form_shop_2605.entity.trade.Trade;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -17,4 +19,10 @@ public interface TradeRepository extends JpaRepository<Trade, Long> {
     @Query("SELECT t FROM Trade t WHERE t.status = :status " +
             "AND NOT EXISTS (SELECT p FROM PointHistory p WHERE p.trade = t)")
     List<Trade> findConfirmedUnsettledTrades(@Param("status")TradeStatus status);
+
+    // 2. 자동 구매 확정 처리 대상 조회
+    @Query("SELECT t FROM Trade t WHERE t.status = :status " +
+            "AND t.receivedAt <= :dueDate")
+    List<Trade> findAutoConfirmTargets(@Param("status") TradeStatus status,
+                                       @Param("dueDate")LocalDateTime dueDate);
 }

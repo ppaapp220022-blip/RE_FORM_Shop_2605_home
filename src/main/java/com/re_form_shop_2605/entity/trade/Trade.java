@@ -71,6 +71,9 @@ public class Trade extends BaseEntity {
     @OneToOne(mappedBy = "trade", fetch = FetchType.LAZY)
     private MannerReview mannerReview;
 
+    @Column(name = "received_at")
+    private LocalDateTime receivedAt;
+
     public void changeStatus(TradeStatus status) {
         this.status = status;
     }
