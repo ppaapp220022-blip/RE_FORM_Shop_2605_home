@@ -2,9 +2,13 @@ package com.re_form_shop_2605.entity.chat;
 
 import com.re_form_shop_2605.entity.BaseEntity;
 import com.re_form_shop_2605.entity.member.Member;
+import com.re_form_shop_2605.entity.trade.Post;
 import com.re_form_shop_2605.entity.trade.Trade;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,13 +24,16 @@ public class ChatRoom extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trade_id", updatable = false)
-    private Trade trade;
+    private Trade trade; // 거래 ID (거래 요청 후 연결)
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="buyer_id", nullable = false)
-    private Member buyer;
+    private Member buyer; // 구매자 member_id
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="seller_id", nullable = false)
-    private Member seller;
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post; // 게시글 ID (판매자는 post.getSellerId()로 접근)
+
+    @OneToMany(mappedBy = "chatRoom")
+    private List<ChatMessage> chatMessages = new ArrayList<>();
 }

@@ -9,6 +9,6 @@ public record ChatRoomDetailDTO(
         MemberBriefDTO seller,
         PostBriefDTO post,
         Long tradeId, // 거래 연결된 경우 (null 가능)
-        TradeStatus tradeStatus, // 거래 상태 (null 가능)
-        PageResponse<ChatMessageDTO> messages
+        TradeStatus tradeStatus // 거래 상태 (null 가능)
+//        PageResponse<ChatMessageDTO> messages
 ) {}
