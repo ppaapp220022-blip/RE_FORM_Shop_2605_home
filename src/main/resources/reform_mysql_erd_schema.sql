@@ -183,8 +183,6 @@ CREATE TABLE chat_room
     post_id    BIGINT             NOT NULL COMMENT '게시글 ID',
     created_at DATETIME           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '채팅방 생성일',
     CONSTRAINT uk_chat_room_post_buyer UNIQUE (post_id, buyer_id),
-    KEY idx_chat_room_buyer_id (buyer_id),
-    KEY idx_chat_room_post_id (post_id),
     CONSTRAINT fk_chat_room_post  FOREIGN KEY (post_id)  REFERENCES post(post_id),
     CONSTRAINT fk_chat_room_buyer FOREIGN KEY (buyer_id) REFERENCES member(member_id),
     CONSTRAINT fk_chat_room_trade FOREIGN KEY (trade_id) REFERENCES trade(trade_id)
@@ -202,7 +200,6 @@ CREATE TABLE chat_message
     created_at DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '메시지 전송 시각',
 
     PRIMARY KEY (message_id),
-
 
     CONSTRAINT fk_chat_message_room FOREIGN KEY (chat_id) REFERENCES chat_room (chat_id),
     CONSTRAINT fk_chat_message_sender FOREIGN KEY (sender_id) REFERENCES member (member_id)

@@ -13,7 +13,7 @@ public class StompChatController {
     /* STOMP 프로토콜을 사용한 웹소켓 메시지 처리를 담당하는 컨트롤러 */
 
     @MessageMapping("/chat")
-    @SendTo("/sub/shat")
+    @SendTo("/sub/chat")
     public String handleMessage(String message){
         log.info("Received chat message: {}", message);
         return message;
