@@ -1,0 +1,35 @@
+package com.re_form_shop_2605.dto.trade;
+
+import com.re_form_shop_2605.entity.Enum.TradeDeliveryType;
+import com.re_form_shop_2605.entity.Enum.TradeStatus;
+
+import java.time.LocalDateTime;
+
+// 거래 상세 응답 DTO
+public record TradeResponseDTO(
+        // 거래 번호
+        Long tradeId,
+        // 판매글 요약 정보
+        PostBriefDTO post,
+        // 구매자 정보
+        MemberBriefDTO buyer,
+        // 판매자 정보
+        MemberBriefDTO seller,
+        // 거래 상태
+        TradeStatus status,
+        // 전달 방식
+        TradeDeliveryType deliveryType,
+        // 배송 주소
+        String deliveryAddress,
+        // 실제 거래 금액
+        int tradePrice,
+        // 정산 완료 일시
+        LocalDateTime completedAt,
+        // 구매 확정 일시
+        LocalDateTime confirmedAt,
+        // 거래 생성일
+        LocalDateTime createdAt,
+        // 리뷰 작성 여부
+        boolean hasReview
+) {
+}

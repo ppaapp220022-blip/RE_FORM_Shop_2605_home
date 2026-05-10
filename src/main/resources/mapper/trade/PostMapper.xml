@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.re_form_shop_2605.mapper.trade.PostMapper">
+    <!--    // 게시글 등록-->
+    <insert id="insertPost" parameterType="com.re_form_shop_2605.domain.trade.PostVO"
+            useGeneratedKeys="true" keyProperty="postId" keyColumn="post_id">
+        INSERT INTO post (content, delivery_type, grade, marking, price, risk_level, size,
+                          sport, status, team, title, uniform_name, view_count, wish_count, seller_id)
+        VALUES (#{content}, #{deliveryType}, #{grade}, #{marking}, #{price}, #{riskLevel}, #{size},
+                #{sport}, #{status}, #{team}, #{title}, #{uniformName}, #{viewCount}, #{wishCount}, #{sellerId})
+    </insert>
+
+    <!--    // 게시글 번호로 단건 조회-->
+    <select id="findPostById" parameterType="java.lang.Long" resultType="com.re_form_shop_2605.domain.trade.PostVO">
+        SELECT * FROM post WHERE post_id = #{postId}
+    </select>
+
+    <!--    // 전체 게시글 목록 조회-->
+    <select id="findAllPosts" resultType="com.re_form_shop_2605.domain.trade.PostVO">
+        SELECT * FROM post ORDER BY post_id DESC
+    </select>
+
+    <!--    // 게시글 전체 정보 수정-->
+    <update id="updatePost" parameterType="com.re_form_shop_2605.domain.trade.PostVO">
+            UPDATE post SET content = #{content}, delivery_type = #{deliveryType}, grade = #{grade}, marking = #{marking},
+                            price = #{price}, risk_level = #{riskLevel}, size = #{size}, sport = #{sport},
+                            status = #{status}, team = #{team}, title = #{title}, uniform_name = #{uniformName},
+                            view_count = #{viewCount}, wish_count = #{wishCount}, seller_id = #{sellerId}
+            WHERE post_id = #{postId}
+    </update>
+
+    <!--    // 게시글 상태만 수정-->
+    <update id="updatePostStatus">
+            UPDATE post SET status = #{status} WHERE post_id = #{postId}
+    </update>
+
+</mapper>

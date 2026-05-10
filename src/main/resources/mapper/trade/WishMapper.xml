@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.re_form_shop_2605.mapper.trade.WishMapper">
+    <!--    // 회원 번호와 게시글 번호로 찜 여부 조회-->
+    <select id="findWishByMemberIdAndPostId" resultType="com.re_form_shop_2605.domain.trade.WishVO">
+            SELECT * FROM wish WHERE member_id = #{memberId} AND post_id = #{postId}
+    </select>
+</mapper>

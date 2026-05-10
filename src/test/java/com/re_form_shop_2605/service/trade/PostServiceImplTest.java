@@ -1,0 +1,143 @@
+package com.re_form_shop_2605.service.trade;
+
+import com.re_form_shop_2605.dto.common.PageResponse;
+import com.re_form_shop_2605.dto.trade.PostCardDTO;
+import com.re_form_shop_2605.dto.trade.PostDetailDTO;
+import com.re_form_shop_2605.dto.trade.PostRequestDTO;
+import com.re_form_shop_2605.dto.trade.PostUpdateRequestDTO;
+import com.re_form_shop_2605.entity.Enum.DeliveryType;
+import com.re_form_shop_2605.entity.Enum.Grade;
+import com.re_form_shop_2605.entity.Enum.MemberStatus;
+import com.re_form_shop_2605.entity.Enum.PostStatus;
+import com.re_form_shop_2605.entity.Enum.Role;
+import com.re_form_shop_2605.entity.Enum.Sport;
+import com.re_form_shop_2605.entity.member.Member;
+import com.re_form_shop_2605.repository.member.MemberRepository;
+import com.re_form_shop_2605.repository.trade.PostRepository;
+import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@Log4j2
+@SpringBootTest
+//@Transactional
+class PostServiceImplTest {
+
+    @Autowired
+    private PostService postService;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private PostRepository postRepository;
+
+    @Test
+    void addPostTest() {
+        Member seller = createSeller("add_post");
+        Long postId = postService.addPost(seller.getMemberId(), createPostRequestDTO("add title"), List.of());
+
+        assertNotNull(postId);
+    }
+
+    @Test
+    void readPostTest() {
+        Member seller = createSeller("read_post");
+        Long postId = postService.addPost(seller.getMemberId(), createPostRequestDTO("read title"), List.of());
+
+        PostDetailDTO postDetailDTO = postService.readPost(postId, null);
+
+        assertEquals("read title", postDetailDTO.title());
+        assertEquals(PostStatus.ON_SALE, postDetailDTO.status());
+    }
+
+    @Test
+    void readAllPostsTest() {
+        Member seller = createSeller("all_post");
+        String titlePrefix = "bulk_title_" + System.nanoTime() + "_";
+        for (int i = 0; i < 10; i++) {
+            postService.addPost(seller.getMemberId(), createPostRequestDTO(titlePrefix + i), List.of());
+        }
+
+        PageResponse<PostCardDTO> posts = postService.readAllPosts(null, 0, 10000);
+        int matchedCount = 0;
+
+        for (PostCardDTO post : posts.content()) {
+            if (post.title().startsWith(titlePrefix)) {
+                matchedCount++;
+            }
+        }
+
+        assertEquals(10, matchedCount);
+    }
+
+    @Test
+    void modifyPostTest() {
+        Member seller = createSeller("modify_post");
+        Long postId = postService.addPost(seller.getMemberId(), createPostRequestDTO("origin title"), List.of());
+
+        PostUpdateRequestDTO requestDTO = new PostUpdateRequestDTO(
+                "updated title",
+                "updated content",
+                Grade.S,
+                "105",
+                false,
+                12000,
+                DeliveryType.DELIVERY
+        );
+
+        postService.modifyPost(postId, seller.getMemberId(), requestDTO, null);
+
+        PostDetailDTO postDetailDTO = postService.readPost(postId, null);
+        assertEquals("updated title", postDetailDTO.title());
+        assertEquals(12000, postDetailDTO.price());
+        assertEquals(Grade.S, postDetailDTO.grade());
+    }
+
+    @Test
+    void removePostTest() {
+        Member seller = createSeller("remove_post");
+        Long postId = postService.addPost(seller.getMemberId(), createPostRequestDTO("remove title"), List.of());
+
+        postService.removePost(postId, seller.getMemberId());
+
+        assertEquals(PostStatus.DELETED, postRepository.findById(postId).orElseThrow().getStatus());
+    }
+
+    private Member createSeller(String prefix) {
+        long seed = System.nanoTime();
+        Member seller = Member.builder()
+                .email(prefix + "_" + seed + "@test.com")
+                .password("1234")
+                .nickname(prefix + "_" + seed)
+                .mannerScore(BigDecimal.ZERO)
+                .role(Role.USER)
+                .status(MemberStatus.ACTIVE)
+                .warningCount(0)
+                .emailEvent(false)
+                .build();
+        return memberRepository.save(seller);
+    }
+
+    private PostRequestDTO createPostRequestDTO(String title) {
+        return new PostRequestDTO(
+                title,
+                "테스트 본문",
+                Sport.BASEBALL,
+                "LG",
+                "유니폼",
+                Grade.A,
+                "100",
+                false,
+                10000,
+                DeliveryType.DIRECT
+        );
+    }
+}

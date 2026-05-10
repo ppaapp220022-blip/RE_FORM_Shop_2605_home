@@ -1,0 +1,16 @@
+package com.re_form_shop_2605.dto.trade;
+
+import java.math.BigDecimal;
+
+// 판매글 카드/상세에서 재사용하는 판매자 요약 DTO
+public record SellerBriefDTO(
+        // 회원 번호
+        Long memberId,
+        // 닉네임
+        String nickname,
+        // 프로필 이미지 URL
+        String profileImageUrl,
+        // 매너 평균 점수
+        BigDecimal mannerScore
+) {
+}

@@ -1,0 +1,79 @@
+package com.re_form_shop_2605.controller.etc;
+
+import com.re_form_shop_2605.dto.common.ApiResponse;
+import com.re_form_shop_2605.dto.common.PageResponse;
+import com.re_form_shop_2605.dto.etc.NotificationDTO;
+import com.re_form_shop_2605.dto.etc.NotificationResponseDTO;
+import com.re_form_shop_2605.service.etc.NotificationService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+// 사용자 알림 조회와 읽음 처리를 담당하는 API
+@RestController
+@RequestMapping("/api/notifications")
+public class NotificationController {
+
+    private final NotificationService notificationService;
+
+    public NotificationController(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
+
+    // GET /api/notifications
+    // 알림 목록과 읽지 않은 개수를 함께 조회
+    @GetMapping
+    public ResponseEntity<ApiResponse<NotificationPageResponse>> readNotifications(
+            @RequestHeader("X-Member-Id") Long memberId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        NotificationResponseDTO responseDTO = notificationService.readNotifications(memberId, page, size);
+        NotificationPageResponse response = new NotificationPageResponse(responseDTO.items(), responseDTO.unreadCount());
+        return ResponseEntity.ok(ApiResponse.ok(response, "알림 목록 조회 완료"));
+    }
+
+    // PATCH /api/notifications/{id}/read
+    // 특정 알림을 읽음 상태로 변경
+    @PatchMapping("/{id}/read")
+    public ResponseEntity<ApiResponse<ReadNotificationResponse>> readNotification(@PathVariable("id") Long notiId) {
+        notificationService.modifyNotificationRead(notiId);
+        return ResponseEntity.ok(ApiResponse.ok(new ReadNotificationResponse(notiId, true), "알림 읽음 처리 완료"));
+    }
+
+    // PATCH /api/notifications/read-all
+    // 현재 사용자의 모든 미확인 알림을 읽음 상태로 변경
+    @PatchMapping("/read-all")
+    public ResponseEntity<ApiResponse<UpdatedCountResponse>> readAllNotifications(
+            @RequestHeader("X-Member-Id") Long memberId
+    ) {
+        NotificationResponseDTO responseDTO = notificationService.readNotifications(memberId, 0, Integer.MAX_VALUE);
+        int updatedCount = 0;
+
+        for (NotificationDTO item : responseDTO.items().content()) {
+            if (!item.isRead()) {
+                notificationService.modifyNotificationRead(item.notiId());
+                updatedCount++;
+            }
+        }
+
+        return ResponseEntity.ok(ApiResponse.ok(new UpdatedCountResponse(updatedCount), "전체 알림 읽음 처리 완료"));
+    }
+
+    // 알림 목록 응답에서 사용하는 래퍼 DTO
+    public record NotificationPageResponse(PageResponse<NotificationDTO> content, int unreadCount) {
+    }
+
+    // 단건 읽음 처리 응답 DTO
+    public record ReadNotificationResponse(Long id, boolean isRead) {
+    }
+
+    // 전체 읽음 처리 결과 DTO
+    public record UpdatedCountResponse(int updatedCount) {
+    }
+}

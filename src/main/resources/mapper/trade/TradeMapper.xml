@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.re_form_shop_2605.mapper.trade.TradeMapper">
+    <!--    // 거래 등록-->
+    <insert id="insertTrade" parameterType="com.re_form_shop_2605.domain.trade.TradeVO"
+            useGeneratedKeys="true" keyProperty="tradeId" keyColumn="trade_id">
+            INSERT INTO trade (delivery_address, delivery_type, status, trade_price, buyer_id, post_id, seller_id)
+            VALUES (#{deliveryAddress}, #{deliveryType}, #{status}, #{tradePrice}, #{buyerId}, #{postId}, #{sellerId})
+    </insert>
+
+    <!--    // 거래 번호로 단건 조회-->
+    <select id="findTradeById" parameterType="java.lang.Long" resultType="com.re_form_shop_2605.domain.trade.TradeVO">
+            SELECT * FROM trade WHERE trade_id = #{tradeId}
+    </select>
+
+    <!--    // 게시글 번호로 거래 조회-->
+    <select id="findTradeByPostId" parameterType="java.lang.Long" resultType="com.re_form_shop_2605.domain.trade.TradeVO">
+            SELECT * FROM trade WHERE post_id = #{postId}
+    </select>
+
+    <!--    // 구매자 회원 번호로 거래 목록 조회-->
+    <select id="findTradesByBuyerId" parameterType="java.lang.Long" resultType="com.re_form_shop_2605.domain.trade.TradeVO">
+            SELECT * FROM trade WHERE buyer_id = #{buyerId} ORDER BY trade_id DESC
+    </select>
+
+    <!--    // 판매자 회원 번호로 거래 목록 조회-->
+    <select id="findTradesBySellerId" parameterType="java.lang.Long" resultType="com.re_form_shop_2605.domain.trade.TradeVO">
+            SELECT * FROM trade WHERE seller_id = #{sellerId} ORDER BY trade_id DESC
+    </select>
+
+    <!--    // 거래 전체 정보 수정-->
+    <update id="updateTrade" parameterType="com.re_form_shop_2605.domain.trade.TradeVO">
+            UPDATE trade SET delivery_address = #{deliveryAddress}, delivery_type = #{deliveryType}, status = #{status},
+                             trade_price = #{tradePrice}, buyer_id = #{buyerId}, post_id = #{postId}, seller_id = #{sellerId},
+                             completed_at = #{completedAt}, confirmed_at = #{confirmedAt}
+                             WHERE trade_id = #{tradeId}
+    </update>
+
+    <!--    // 거래 상태만 수정-->
+    <update id="updateTradeStatus">
+            UPDATE trade SET status = #{status} WHERE trade_id = #{tradeId}
+    </update>
+
+</mapper>

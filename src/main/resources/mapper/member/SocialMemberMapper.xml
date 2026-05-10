@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.re_form_shop_2605.mapper.member.SocialMemberMapper">
+    <!--    // 소셜 로그인 회원가입-->
+    <insert id="insertSocialMember" parameterType="com.re_form_shop_2605.domain.member.SocialMemberVO"
+            useGeneratedKeys="true" keyProperty="socialId" keyColumn="social_id">
+        INSERT INTO social_member (member_id, provider, provider_id)
+        VALUES (#{member_id}, #{provider}, #{providerId})
+    </insert>
+
+    <!--    // 소셜 로그인 회원 정보 조회-->
+    <select id="findSocialMemberById" parameterType="java.lang.Long" resultType="com.re_form_shop_2605.domain.member.SocialMemberVO">
+        SELECT * FROM social_member WHERE social_id = #{socialId}
+    </select>
+
+    <!--    // 카카오/구글 기준 회원 정보 조회-->
+    <select id="findSocialMemberByMemberIdAndProvider" resultType="com.re_form_shop_2605.domain.member.SocialMemberVO">
+        SELECT * FROM social_member WHERE member_id = #{memberId} AND provider = #{provider}
+    </select>
+
+    <!--    // 카카오/구글 소셜Id 기준 회원 정보 조회-->
+    <select id="findSocialMemberByProviderAndProviderId" resultType="com.re_form_shop_2605.domain.member.SocialMemberVO">
+        SELECT * FROM social_member WHERE provider = #{provider} AND provider_id = #{providerId}
+    </select>
+
+    <!--    // 일반 회원 id 기준 소셜 로그인 회원 목록 조회-->
+    <select id="findSocialMembersByMemberId" parameterType="java.lang.Long" resultType="com.re_form_shop_2605.domain.member.SocialMemberVO">
+        SELECT * FROM social_member WHERE member_id = #{memberId}
+    </select>
+
+    <!--    // 소셜 로그인 멤버 탈퇴-->
+    <delete id="deleteSocialMember" parameterType="java.lang.Long">
+        DELETE FROM social_member WHERE social_id = #{socialId}
+    </delete>
+
+    <!--    // 소셜 로그인 멤버 탈퇴 및 일반 회원 탈퇴-->
+    <delete id="deleteSocialMembersByMemberId" parameterType="java.lang.Long">
+        DELETE FROM social_member WHERE member_id = #{memberId}
+    </delete>
+</mapper>
