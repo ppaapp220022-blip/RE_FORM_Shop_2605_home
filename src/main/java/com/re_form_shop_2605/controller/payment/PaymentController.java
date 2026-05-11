@@ -36,6 +36,8 @@ public class PaymentController {
             @RequestBody PaymentInitRequestDTO request
 //            , @AuthenticationPrincipal UserDetails userDetails
     ) {
+        log.info("==== initPayment 결제 초기화 주문 생성 ... ====");
+
         // todo!!!!! Security 완성되면 buyerId 꺼내기
         // 구매자가 결제하기 클릭 → Security 세션에서 로그인 유저 정보 꺼냄 → memberId 추출 → Service에 buyerId로 넘겨줌
         Long buyerId = 1L; // todo!!!!!!!!!!!!!!!
@@ -51,6 +53,8 @@ public class PaymentController {
     public ResponseEntity<PaymentResponseDTO> confirmPayment(
             @RequestBody PaymentConfirmRequestDTO request
     ) {
+        log.info("==== confirmPayment 토스 결제 승인 ... ====");
+
         PaymentResponseDTO response = paymentService.confirmPayment(request);
 
         return ResponseEntity.ok(response);
@@ -60,6 +64,8 @@ public class PaymentController {
     @Operation(summary = "결제 정보 조회", description = "tradeId로 결제 정보 조회")
     @GetMapping("/{tradeId}")
     public ResponseEntity<PaymentResponseDTO> viewPayment(@PathVariable Long tradeId) {
+        log.info("==== viewPayment 결제 정보 조회 ... ====");
+
         // todo!!!! 결제 정보 조회 구현
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); // todo!!!!!!
     }
@@ -72,6 +78,8 @@ public class PaymentController {
             @PathVariable String paymentKey,
             @RequestBody PaymentCancelRequestDTO request
     ) {
+        log.info("==== cancelPayment 결제 취소 ... ====");
+
         PaymentResponseDTO response = paymentService.cancelPayment(paymentKey, request);
         return ResponseEntity.ok(response);
     }

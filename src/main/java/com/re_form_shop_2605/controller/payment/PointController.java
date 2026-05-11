@@ -78,13 +78,13 @@ public class PointController {
     }
 
     /* 5. 내 출금 요청 취소 */
-    // todo!!! Body 반환 200? 204?
     @DeleteMapping("/cancel/{withdrawId}")
     public ResponseEntity<Void> cancelRequestWithdraw(
             @PathVariable Long withdrawId,
             @RequestParam("memberId") Long memberId
     ) {
         log.info("==== cancelRequestWithdraw 사용자 출금 요청 취소 ... ====");
+
         pointService.cancelWithdraw(memberId, withdrawId);
         return ResponseEntity.noContent().build();
     }
