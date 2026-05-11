@@ -18,7 +18,6 @@ import java.util.List;
 @Entity
 @Table(name = "trade")
 public class Trade extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "trade_id", nullable = false)
@@ -83,4 +82,10 @@ public class Trade extends BaseEntity {
     @OneToMany(mappedBy = "trade")
     private List<MannerReview> mannerReview;
 
+//    @Column(name = "received_at")
+//    private LocalDateTime receivedAt;
+
+//    public void changeStatus(TradeStatus status) {
+//        this.status = status;
+//    }
 }

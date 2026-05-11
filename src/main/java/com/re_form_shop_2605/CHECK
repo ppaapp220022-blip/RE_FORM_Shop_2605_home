@@ -15,3 +15,11 @@
 - 응답 형식 반드시 협의
 - HTTP 상태코드 변경 시 합의
 - @Transactional 범위 변경 시 롤백 시나리오 재검토
+
+
+3. 참고
+save(payment)                // INSERT / UPDATE
+findById(id)                 // PK로 단건 조회
+findAll()                    // 전체 조회
+delete(payment)              // DELETE
+existsById(id)               // 존재 여부 확인

@@ -42,7 +42,7 @@ public class Post extends BaseEntity {
     @Column(name = "sport",nullable = false)
     private Sport sport; // 종목
 
-    @Column(name = "team", nullable = false)
+    @Column(name = "team", nullable = false, length = 50)
     private String team; // 구단명
 
     @Column(name = "uniform_name",length = 200, nullable = false)
