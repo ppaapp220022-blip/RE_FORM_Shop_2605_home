@@ -132,8 +132,8 @@ CREATE TABLE trade
 (
     trade_id         BIGINT PRIMARY KEY                   NOT NULL AUTO_INCREMENT COMMENT '거래 ID',
     post_id          BIGINT                               NOT NULL UNIQUE COMMENT '게시글 ID',
-    buyer_id         BIGINT                               NOT NULL COMMENT '판매자 member id',
-    seller_id        BIGINT                               NOT NULL COMMENT '구매자 member id',
+    buyer_id         BIGINT                               NOT NULL COMMENT '구매자 member id',
+    seller_id        BIGINT                               NOT NULL COMMENT '판매자 member id',
     status           ENUM ('REQUESTED', 'ACCEPTED', 'PAID', 'IN_PROGRESS',
         'CONFIRMED', 'COMPLETED', 'CANCELED', 'DISPUTED') NOT NULL COMMENT '거래 상태',
     delivery_type    ENUM ('DIRECT', 'DELIVERY')          NULL COMMENT '전달 방법 (수령 / 배송)',
@@ -142,6 +142,7 @@ CREATE TABLE trade
     completed_at     DATETIME                             NULL COMMENT '정산 완료 일시',
     confirmed_at     DATETIME                             NULL COMMENT '구매 확정 일시',
     created_at       DATETIME                             NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    received_at      DATETIME                             NULL,
     KEY idx_trade_buyer_id (buyer_id),
     KEY idx_trade_seller_id (seller_id),
     KEY idx_trade_status (status),
@@ -158,8 +159,8 @@ CREATE TABLE manner_review
 (
     manner_id  BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     trade_id   BIGINT             NOT NULL COMMENT '거래 ID',
-    buyer_id   BIGINT             NOT NULL COMMENT '작성자 member id',
-    seller_id  BIGINT             NOT NULL COMMENT '구매자 member id',
+    buyer_id   BIGINT             NOT NULL COMMENT '구매자(작성자) member id',
+    seller_id  BIGINT             NOT NULL COMMENT '판매자(평가 대상) member id',
     score      DOUBLE             NOT NULL COMMENT '매너 점수 (0.0 ~ 5.0)',
     content    TEXT               NULL COMMENT '텍스트 후기',
     created_at DATETIME           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '작성 시간',
@@ -171,25 +172,40 @@ CREATE TABLE manner_review
 ) ENGINE = InnoDB;
 
 
--- 10. 채팅방 로그 0
+-- 10. 채팅방
 -- PK : chat_id   |  FK : trade_id, buyer_id, seller_id
 -- IDX : buyer_id, seller_id
 CREATE TABLE chat_room
 (
     chat_id    BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    trade_id   BIGINT             NOT NULL,
-    buyer_id   BIGINT             NOT NULL,
-    seller_id  BIGINT             NOT NULL,
-    created_at DATETIME           NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    KEY idx_chat_room_buyer_id (buyer_id),
-    KEY idx_chat_room_seller_id (seller_id),
-    CONSTRAINT fk_chat_room_trade FOREIGN KEY (trade_id) REFERENCES trade (trade_id),
-    CONSTRAINT fk_chat_room_buyer_member FOREIGN KEY (buyer_id) REFERENCES member (member_id),
-    CONSTRAINT fk_chat_room_seller_member FOREIGN KEY (seller_id) REFERENCES member (member_id)
+    trade_id   BIGINT             NULL comment '거래 ID (거래 요청 후 연결)',
+    buyer_id   BIGINT             NOT NULL COMMENT '구매자 member_id',
+    post_id    BIGINT             NOT NULL COMMENT '게시글 ID',
+    created_at DATETIME           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '채팅방 생성일',
+    CONSTRAINT uk_chat_room_post_buyer UNIQUE (post_id, buyer_id),
+    CONSTRAINT fk_chat_room_post  FOREIGN KEY (post_id)  REFERENCES post(post_id),
+    CONSTRAINT fk_chat_room_buyer FOREIGN KEY (buyer_id) REFERENCES member(member_id),
+    CONSTRAINT fk_chat_room_trade FOREIGN KEY (trade_id) REFERENCES trade(trade_id)
 ) ENGINE = InnoDB;
 
+-- 11. 채팅 기록
+CREATE TABLE chat_message
+(
+    message_id BIGINT      NOT NULL AUTO_INCREMENT COMMENT '메시지 ID',
+    chat_id    BIGINT      NOT NULL COMMENT '채팅방 ID',
+    sender_id  BIGINT      NOT NULL COMMENT '발신자 member_id',
+    content    TEXT        NULL COMMENT '메시지 내용 (이미지 전송 시 NULL 가능)',
+    type       VARCHAR(10) NOT NULL COMMENT '메시지 타입 (TEXT / IMAGE / SYSTEM)',
+    is_read    BOOLEAN     NOT NULL DEFAULT FALSE COMMENT '읽음 여부',
+    created_at DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '메시지 전송 시각',
 
--- 11. 결제 기록 0
+    PRIMARY KEY (message_id),
+
+    CONSTRAINT fk_chat_message_room FOREIGN KEY (chat_id) REFERENCES chat_room (chat_id),
+    CONSTRAINT fk_chat_message_sender FOREIGN KEY (sender_id) REFERENCES member (member_id)
+) ENGINE = InnoDB;
+
+-- 12. 결제 기록 0
 -- PK : payment_id   |  FK : trade_id
 CREATE TABLE payment
 (
@@ -208,7 +224,7 @@ CREATE TABLE payment
 ) ENGINE = InnoDB;
 
 
--- 12. 토스 로그 기록 (append-only) 0
+-- 13. 토스 로그 기록 (append-only) 0
 -- PK : log_id   |  FK : payment_id
 CREATE TABLE toss_log
 (
@@ -221,7 +237,7 @@ CREATE TABLE toss_log
 ) ENGINE = InnoDB;
 
 
--- 13. 회원별 출금 포인트 조회 0
+-- 14. 회원별 출금 포인트 조회 0
 -- PK : wallet_id   |  FK : member_id
 CREATE TABLE point_wallet
 (
@@ -234,7 +250,7 @@ CREATE TABLE point_wallet
 ) ENGINE = InnoDB;
 
 
--- 14. 회원별 출금 포인트 변동 내역 0
+-- 15. 회원별 출금 포인트 변동 내역 0
 -- PK : point_id   |  FK : wallet_id, trade_id
 -- IDX : wallet_id, trade_id
 CREATE TABLE point_history
@@ -253,7 +269,7 @@ CREATE TABLE point_history
 ) ENGINE = InnoDB;
 
 
--- 15. 포인트 현금화 요청 목록 0
+-- 16. 포인트 현금화 요청 목록 0
 -- PK : withdraw_id   |  FK : member_id
 -- IDX : member_id, status
 CREATE TABLE point_request
@@ -272,13 +288,13 @@ CREATE TABLE point_request
 ) ENGINE = InnoDB;
 
 
--- 16. 커뮤니티 글 목록 0
+-- 17. 커뮤니티 글 목록 0
 -- PK : comm_id   |  FK : member_id
 -- 거래 매물 게시글 필드와 구분짓기 위해 중복된 필드명은 앞에 comm_ 붙여 구분했습니다
 CREATE TABLE community_post
 (
-    comm_id         BIGINT PRIMARY KEY                                                 NOT NULL AUTO_INCREMENT,
-    member_id       BIGINT                                                             NOT NULL,
+    comm_id         BIGINT PRIMARY KEY                                                 NOT NULL AUTO_INCREMENT COMMENT '커뮤니티 게시글 ID',
+    member_id       BIGINT                                                             NOT NULL COMMENT '작성자 member_id',
     sport_category  ENUM ('SOCCER', 'BASEBALL', 'BASKETBALL', 'VOLLEYBALL', 'ESPORTS') NOT NULL COMMENT '종목',
     team_category   VARCHAR(50)                                                        NULL COMMENT '구단명',
     comm_title      VARCHAR(200)                                                       NOT NULL COMMENT '제목',
@@ -288,25 +304,25 @@ CREATE TABLE community_post
     like_count      INT                                                                NOT NULL DEFAULT 0 COMMENT '좋아요 수',
     comment_count   INT                                                                NOT NULL DEFAULT 0 COMMENT '댓글 수',
     status          ENUM ('ACTIVE', 'HIDDEN', 'DELETED')                               NOT NULL COMMENT '게시글 상태',
-    created_at      DATETIME                                                           NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at      DATETIME                                                           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '작성일',
     KEY idx_community_post_member_id (member_id),
     CONSTRAINT fk_community_post_member FOREIGN KEY (member_id) REFERENCES member (member_id)
 ) ENGINE = InnoDB;
 
 
--- 17. 댓글 목록 0
+-- 18. 댓글 목록 0
 -- PK : reply_id   |  FK : post_id, member_id, parent_id
 -- IDX : post_id, member_id, parent_id
 CREATE TABLE reply
 (
-    reply_id      BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    post_id       BIGINT             NOT NULL,
-    member_id     BIGINT             NOT NULL,
+    reply_id      BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT COMMENT '댓글 ID',
+    post_id       BIGINT             NOT NULL COMMENT '커뮤니티 게시글 ID',
+    member_id     BIGINT             NOT NULL COMMENT '작성자 member_id',
     parent_id     BIGINT             NULL COMMENT '대댓글의 부모 댓글',
     reply_content TEXT               NULL COMMENT '댓글 내용',
-    is_deleted    BOOLEAN            NOT NULL DEFAULT FALSE,
-    like_count    INT                NOT NULL DEFAULT 0,
-    created_at    DATETIME           NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_deleted    BOOLEAN            NOT NULL DEFAULT FALSE COMMENT '삭제 여부 (soft delete)',
+    like_count    INT                NOT NULL DEFAULT 0 COMMENT '좋아요 수',
+    created_at    DATETIME           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '작성일',
     KEY idx_comment_post_id (post_id),
     KEY idx_comment_member_id (member_id),
     KEY idx_comment_parent_id (parent_id),
@@ -316,7 +332,7 @@ CREATE TABLE reply
 ) ENGINE = InnoDB;
 
 
--- 18. 회원별 출금 포인트 조회 0
+-- 19. 회원별 출금 포인트 조회 0
 -- PK : point_id   |  FK : reporter_id
 -- IDX : reporter_id, target_type + target_id
 CREATE TABLE report
@@ -335,7 +351,7 @@ CREATE TABLE report
 ) ENGINE = InnoDB;
 
 
--- 19. 알림 목록 0
+-- 20. 알림 목록 0
 -- PK : noti_id   |  FK : member_id
 -- IDX : member_id, type
 CREATE TABLE notification

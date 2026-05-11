@@ -33,7 +33,6 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.ai:spring-ai-starter-model-openai'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -56,11 +55,6 @@ dependencies {
     // toss 관련 추가 (민정)
     // https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-    // Source: https://mvnrepository.com/artifact/org.modelmapper/modelmapper
-    implementation 'org.modelmapper:modelmapper:3.2.5'
 }
 
 dependencyManagement {

@@ -1,13 +1,13 @@
 package com.re_form_shop_2605.entity.chat;
 
 import com.re_form_shop_2605.entity.BaseEntity;
+import com.re_form_shop_2605.entity.Enum.MessageType;
 import com.re_form_shop_2605.entity.member.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.ai.chat.messages.MessageType;
 
 @Entity
 @Getter
@@ -24,19 +24,19 @@ public class ChatMessage extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id", nullable = false)
-    private ChatRoom chatRoom;  // 어느 채팅방의 메시지인지
+    private ChatRoom chatRoom; // 어느 채팅방의 메시지인지
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
-    private Member sender;      // 보낸 사람
+    private Member member; // 보낸 사람
 
     @Column(name = "content", columnDefinition = "TEXT")
-    private String content;     // 메시지 내용
+    private String content; // 메시지 내용
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private MessageType type;   // TEXT / IMAGE / SYSTEM
+    private MessageType type; // TEXT / IMAGE / SYSTEM
 
     @Column(name = "is_read", nullable = false)
-    private boolean isRead = false;  // 읽음 여부
+    private boolean isRead = false; // 읽음 여부
 }

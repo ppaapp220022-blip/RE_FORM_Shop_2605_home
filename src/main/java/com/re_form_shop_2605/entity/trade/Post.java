@@ -2,6 +2,7 @@ package com.re_form_shop_2605.entity.trade;
 
 import com.re_form_shop_2605.entity.*;
 import com.re_form_shop_2605.entity.Enum.*;
+import com.re_form_shop_2605.entity.chat.ChatRoom;
 import com.re_form_shop_2605.entity.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -88,6 +89,9 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Wish> wishes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    private List<ChatRoom> chatRooms = new ArrayList<>();
 
     @OneToOne(mappedBy = "post", fetch = FetchType.LAZY)
     private Trade trade;

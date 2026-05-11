@@ -3,11 +3,15 @@ package com.re_form_shop_2605.entity.trade;
 import com.re_form_shop_2605.entity.BaseEntity;
 import com.re_form_shop_2605.entity.Enum.TradeDeliveryType;
 import com.re_form_shop_2605.entity.Enum.TradeStatus;
+import com.re_form_shop_2605.entity.chat.ChatRoom;
+import com.re_form_shop_2605.entity.member.MannerReview;
 import com.re_form_shop_2605.entity.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.List;
 
 @Getter
@@ -18,6 +22,7 @@ import java.util.List;
 @Entity
 @Table(name = "trade")
 public class Trade extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "trade_id", nullable = false)
@@ -52,10 +57,6 @@ public class Trade extends BaseEntity {
     @Column(name = "status", nullable = false)
     private TradeStatus status;
 
-    public void changeStatus(TradeStatus status) {
-        this.status = status;
-    }
-
     @Enumerated(EnumType.STRING)
     @Column(name = "delivery_type")
     private TradeDeliveryType deliveryType;
@@ -76,16 +77,18 @@ public class Trade extends BaseEntity {
     @Column(name = "confirmed_at")
     private LocalDateTime confirmedAt;
 
+    // 부모
+    @OneToMany(mappedBy = "trade")
+    private List<ChatRoom> chatRooms = new ArrayList<>();
+
+    @OneToOne(mappedBy = "trade", fetch = FetchType.LAZY)
+    private MannerReview mannerReview;
+
     @Column(name = "received_at")
     private LocalDateTime receivedAt;
 
-    @OneToMany(mappedBy = "trade")
-    private List<MannerReview> mannerReview;
 
-//    @Column(name = "received_at")
-//    private LocalDateTime receivedAt;
-
-//    public void changeStatus(TradeStatus status) {
-//        this.status = status;
-//    }
+    public void changeStatus(TradeStatus status) {
+        this.status = status;
+    }
 }

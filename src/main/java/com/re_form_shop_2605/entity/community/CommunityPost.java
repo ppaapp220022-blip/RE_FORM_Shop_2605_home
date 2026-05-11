@@ -7,12 +7,15 @@ import com.re_form_shop_2605.entity.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity
 @Builder
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class CommunityPost extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +24,7 @@ public class CommunityPost extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member memberId;
+    private Member member; // 커뮤니티 게시글 ID
 
     @Enumerated(EnumType.STRING)
     @Column(name = "sport_category", nullable = false)
@@ -51,4 +54,7 @@ public class CommunityPost extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private CommunityPostStatus status; // 게시글 상태
+
+    @OneToMany(mappedBy = "communityPost")
+    private List<Reply> replies =  new ArrayList<>();
 }

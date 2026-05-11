@@ -3,6 +3,10 @@ package com.re_form_shop_2605.entity.member;
 import com.re_form_shop_2605.entity.BaseEntity;
 import com.re_form_shop_2605.entity.Enum.MemberStatus;
 import com.re_form_shop_2605.entity.Enum.Role;
+import com.re_form_shop_2605.entity.chat.ChatMessage;
+import com.re_form_shop_2605.entity.chat.ChatRoom;
+import com.re_form_shop_2605.entity.community.CommunityPost;
+import com.re_form_shop_2605.entity.community.Reply;
 import jakarta.persistence.*;
 import lombok.*;
 import org.jspecify.annotations.Nullable;
@@ -63,6 +67,18 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<InterestKeyword> interestKeywords = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<ChatMessage> chatMessages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "buyer")
+    private List<ChatRoom> chatRooms = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<CommunityPost> communityPosts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Reply> replies = new ArrayList<>();
 
     @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
     private InterestSetting interestSetting;
