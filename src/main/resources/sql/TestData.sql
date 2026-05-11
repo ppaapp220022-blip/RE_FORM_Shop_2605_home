@@ -14,3 +14,14 @@ VALUES (2, '테스트 유니폼', '테스트 내용', 'SOCCER', '테스트팀', 
 -- 4. trade 삽입
 INSERT INTO trade (post_id, buyer_id, seller_id, status, trade_price, created_at)
 VALUES (1, 1, 2, 'ACCEPTED', 15000, NOW());
+
+
+
+-- 포인트 / 출금 테스트용 데이터
+-- point_wallet 삽입 (member_id = 1 기준)
+INSERT INTO point_wallet (member_id, balance, withdrawable, pending)
+VALUES (1, 0, 0, 0);
+
+-- point_history 삽입 (테스트용)
+INSERT INTO point_history (wallet_id, trade_id, type, change_amount, balance, created_at)
+VALUES (1, null, 'EARN', 15000, 15000, NOW());

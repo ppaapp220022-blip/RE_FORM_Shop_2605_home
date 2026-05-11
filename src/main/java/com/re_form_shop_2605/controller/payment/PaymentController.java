@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PaymentController {
     /*
+    7. 결제
     | POST | `/api/payments/init`               | 결제 초기화 (주문 생성) | Response: 201 Created
     | POST | `/api/payments/confirm`            | 토스 결제 승인        | Response: 200 OK
     | GET  | `/api/payments/{tradeId}`          | 결제 정보 조회        |
