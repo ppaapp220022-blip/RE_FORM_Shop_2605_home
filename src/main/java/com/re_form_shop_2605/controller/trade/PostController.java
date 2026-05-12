@@ -7,6 +7,7 @@ import com.re_form_shop_2605.dto.trade.PostCreateFormDTO;
 import com.re_form_shop_2605.dto.trade.PostDetailDTO;
 import com.re_form_shop_2605.dto.trade.PostUpdateFormDTO;
 import com.re_form_shop_2605.entity.Enum.DeliveryType;
+import com.re_form_shop_2605.entity.Enum.Grade;
 import com.re_form_shop_2605.entity.Enum.Sport;
 import com.re_form_shop_2605.service.trade.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +28,11 @@ public class PostController {
         this.postService = postService;
     }
 
+    /**
+     * 작성자: 손민정
+     * 작성일: 2026-05-12
+     * 설명: 거래 매물 게시글 검색 - 키워드/필터/정렬/페이지네이션
+     */
     // GET /api/listings
     // 판매글 목록을 페이지 단위로 조회
     @Operation(
@@ -39,10 +45,16 @@ public class PostController {
             @RequestParam(required = false) Sport sport,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) DeliveryType tradeType,
+            @RequestParam(required = false) Grade condition,    // 추가 (확인 후 주석 삭제)
+            @RequestParam(required = false) Integer minPrice,   // 추가 (확인 후 주석 삭제)
+            @RequestParam(required = false) Integer maxPrice,   // 추가 (확인 후 주석 삭제)
+            @RequestParam(defaultValue = "latest") String sort, // 추가 (확인 후 주석 삭제)
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return ResponseEntity.ok(ApiResponse.ok(postService.readAllPosts(memberId, page, size), "판매글 목록 조회 완료"));
+//        return ResponseEntity.ok(ApiResponse.ok(postService.readAllPosts(memberId, page, size), "판매글 목록 조회 완료"));
+        return ResponseEntity.ok(ApiResponse.ok(postService.searchPosts(keyword, sport, condition, tradeType, minPrice, maxPrice, sort, page, size, memberId),
+                "판매글 목록 조회 완료"));
     }
 
     // GET /api/listings/{id}
@@ -109,4 +121,5 @@ public class PostController {
     // 생성/수정 응답에서 사용하는 식별자 DTO
     public record IdResponse(Long id) {
     }
+
 }

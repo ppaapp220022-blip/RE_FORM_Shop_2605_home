@@ -1,3 +1,11 @@
+/**
+ * 작성자: 손민정
+ * 작성일: 2026-05-11
+ * 설명: 포인트/출금 비즈니스 로직
+ *       - 포인트 지갑 조회, 이력 조회
+ *       - 출금 요청/취소/승인/반려 처리
+ */
+
 package com.re_form_shop_2605.service.payment;
 
 import com.re_form_shop_2605.dto.admin.AdminWithdrawActionRequestDTO;

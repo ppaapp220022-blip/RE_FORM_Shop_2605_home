@@ -1,3 +1,10 @@
+/**
+ * 작성자: 손민정
+ * 작성일: 2026-05-09
+ * 설명: 결제 API (토스페이먼츠 연동)
+ *       - 결제 초기화, 승인, 조회, 취소
+ */
+
 package com.re_form_shop_2605.controller.payment;
 
 import com.re_form_shop_2605.dto.payment.*;
