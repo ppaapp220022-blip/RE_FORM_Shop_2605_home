@@ -31,20 +31,20 @@ public interface PostMapper {
     // 1. 검색/필터/정렬 조회
     List<PostCardVO> findPostsByCondition(@Param("keyword") String keyword,
                                           @Param("sport") Sport sport,
-                                          @Param("grade") Grade condition,
-                                          @Param("deliveryType") DeliveryType tradeType,
+                                          @Param("condition") Grade condition,
+                                          @Param("tradeType") DeliveryType tradeType,
                                           @Param("minPrice") Integer minPrice,
                                           @Param("maxPrice") Integer maxPrice,
                                           @Param("sort") String sort,
-                                          @Param("page") int page,
+                                          @Param("offset") int offset,
                                           @Param("size") int size,
                                           @Param("memberId") Long memberId); // 로그인 사용자 찜 여부 확인용
 
     // 2. 전체 건수 (페이지네이션용)
     int countPostByCondition(@Param("keyword") String keyword,
                              @Param("sport") Sport sport,
-                             @Param("grade") Grade condition,
-                             @Param("deliveryType") DeliveryType tradeType,
+                             @Param("condition") Grade condition,
+                             @Param("tradeType") DeliveryType tradeType,
                              @Param("minPrice") Integer minPrice,
                              @Param("maxPrice") Integer maxPrice);
 }

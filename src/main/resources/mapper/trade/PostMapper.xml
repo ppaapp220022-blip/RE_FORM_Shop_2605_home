@@ -41,7 +41,7 @@
     <!-- 1. 검색/필터/정렬 조회 -->
     <select id="findPostsByCondition" resultType="com.re_form_shop_2605.domain.trade.PostCardVO">
         SELECT p.post_id, p.title, p.team, p.sport, p.price, p.grade, p.size,
-               p.delivery_type, p.status, p.view_count, p.wish_count, p.created_at,
+               p.delivery_type AS tradeType, p.status, p.view_count, p.wish_count AS likeCount, p.created_at,
                m.member_id AS sellerMemberId, m.nickname AS sellerNickname,
                m.profile_image_url AS sellerProfileImageUrl,
                m.manner_score AS sellerMannerScore,
@@ -87,7 +87,7 @@
                 ORDER BY p.created_at DESC
             </otherwise>
         </choose>
-        LIMIT #{size} OFFSET #{page} * #{size}
+        LIMIT #{size} OFFSET #{offset}
     </select>
 
     <!-- 2. 전체 건수 (페이지네이션용) -->

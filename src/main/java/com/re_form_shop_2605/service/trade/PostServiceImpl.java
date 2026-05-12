@@ -265,11 +265,12 @@ public class PostServiceImpl implements PostService {
     /* 조건에 따른 검색 결과 조회 */
     @Override
     public PageResponse<PostCardDTO> searchPosts(String keyword, Sport sport, Grade condition, DeliveryType tradeType,
-                                                 Integer minPrice, Integer maxPrice, String sort,
-                                                 int page, int size, Long memberId) {
+                                                  Integer minPrice, Integer maxPrice, String sort,
+                                                  int page, int size, Long memberId) {
         // 1) 게시글 목록 조회
+        int offset = page * size;
         List<PostCardVO> posts = postMapper.findPostsByCondition(
-                keyword, sport, condition, tradeType, minPrice, maxPrice, sort, page, size, memberId);
+                keyword, sport, condition, tradeType, minPrice, maxPrice, sort, offset, size, memberId);
 
         // 2) 전체 건수 조회
         int totalElements = postMapper.countPostByCondition(
