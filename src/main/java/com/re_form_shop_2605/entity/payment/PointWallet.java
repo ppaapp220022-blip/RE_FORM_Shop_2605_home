@@ -48,10 +48,10 @@ public class PointWallet {
     }
 
     // 3) 구매 확정 시
-    public void confirm(int amount) {
-        this.pending -= amount;
-        this.balance += amount;
-        this.withdrawable += amount;
+    public void confirm(int tradePrice, int point) {
+        this.pending -= tradePrice;
+        this.balance += point;
+        this.withdrawable += point;
     }
 
     // 4) 출금 요청 시

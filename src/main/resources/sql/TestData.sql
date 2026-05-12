@@ -53,3 +53,30 @@ VALUES (3, null, 'WITHDRAW', -20000, 30000, NOW());
 
 INSERT INTO point_history (wallet_id, trade_id, type, change_amount, balance, created_at)
 VALUES (4, null, 'EARN', 100000, 100000, NOW());
+
+
+
+-- 배치 테스트용 데이터
+-- 1. 자동 구매확정 테스트용
+-- RECEIVED 상태 + received_at이 5일 이상 지난 거래
+-- 배치 실행 후 결과 : status = 'CONFIRMED' -> 미정산 처리 진행
+INSERT INTO trade (seller_id, buyer_id, post_id, status, delivery_type, trade_price, received_at, created_at)
+VALUES
+    (1, 2, 1, 'RECEIVED', 'DELIVERY', 75000, DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_SUB(NOW(), INTERVAL 10 DAY)),
+    (3, 4, 6, 'RECEIVED', 'DELIVERY', 80000, DATE_SUB(NOW(), INTERVAL 7 DAY), DATE_SUB(NOW(), INTERVAL 12 DAY)),
+    (5, 6, 11, 'RECEIVED', 'DELIVERY', 85000, DATE_SUB(NOW(), INTERVAL 8 DAY), DATE_SUB(NOW(), INTERVAL 15 DAY));
+
+-- 2. 미정산 처리 테스트용
+-- CONFIRMED 상태 + point_history에 해당 trade_id 없는 거래
+-- point_wallet.balance 증가, point_history.type = 'EARN', trade.status = 'COMPLETED'
+INSERT INTO trade (seller_id, buyer_id, post_id, status, delivery_type, trade_price, received_at, confirmed_at, created_at)
+VALUES
+    (7, 8, 16, 'CONFIRMED', 'DELIVERY', 72000, DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_SUB(NOW(), INTERVAL 15 DAY)),
+    (9, 10, 21, 'CONFIRMED', 'DELIVERY', 88000, DATE_SUB(NOW(), INTERVAL 12 DAY), DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_SUB(NOW(), INTERVAL 18 DAY));
+
+-- 테스트 데이터 pending 업데이트
+UPDATE point_wallet SET pending = 75000 WHERE member_id = 1;
+UPDATE point_wallet SET pending = 80000 WHERE member_id = 3;
+UPDATE point_wallet SET pending = 85000 WHERE member_id = 5;
+UPDATE point_wallet SET pending = 72000 WHERE member_id = 7;
+UPDATE point_wallet SET pending = 88000 WHERE member_id = 9;
