@@ -53,7 +53,8 @@ public class SettlementJobConfig {
     @Bean
     public Step setStep() {
         return new StepBuilder("setStep", jobRepository)
-                .<Trade, SettlementResult>chunk(10, platformTransactionManager)
+                .<Trade, SettlementResult>chunk(10)
+                .transactionManager(platformTransactionManager)
                 .reader(new ItemReader<>() {
                     private List<Trade> trades;
                     private int index = 0;
@@ -75,7 +76,8 @@ public class SettlementJobConfig {
     @Bean
     public Step autoConfirmStep() {
         return new StepBuilder("autoConfirmStep", jobRepository)
-                .<Trade, Trade>chunk(10, platformTransactionManager)
+                .<Trade, Trade>chunk(10)
+                .transactionManager(platformTransactionManager)
                 .reader(autoConfirmReader())
                 .writer(autoConfirmWriter())
                 .build();
