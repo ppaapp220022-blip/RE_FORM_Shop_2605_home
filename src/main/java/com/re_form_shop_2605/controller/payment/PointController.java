@@ -1,10 +1,3 @@
-/**
- * 작성자: 손민정
- * 작성일: 2026-05-11
- * 설명: 포인트/출금 API
- *       - 포인트 지갑 조회, 이력 조회, 출금 요청/취소
- */
-
 package com.re_form_shop_2605.controller.payment;
 
 import com.re_form_shop_2605.dto.login.MemberSecurityDTO;
@@ -22,6 +15,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+/**
+ * 작성자: 손민정
+ * 작성일: 2026-05-11
+ * 설명: 포인트/출금 API
+ *       - 포인트 지갑 조회, 이력 조회, 출금 요청/취소
+ */
 
 @Log4j2
 @RestController

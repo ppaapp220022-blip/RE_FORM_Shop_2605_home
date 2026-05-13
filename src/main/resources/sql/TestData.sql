@@ -78,3 +78,14 @@ UPDATE point_wallet SET pending = 80000 WHERE member_id = 3;
 UPDATE point_wallet SET pending = 85000 WHERE member_id = 5;
 UPDATE point_wallet SET pending = 72000 WHERE member_id = 7;
 UPDATE point_wallet SET pending = 88000 WHERE member_id = 9;
+
+
+
+-- viewPayment 테스트
+-- 1. trade 더미 데이터
+INSERT INTO trade (seller_id, buyer_id, post_id, status, delivery_type, trade_price, created_at)
+VALUES (1, 2, 1, 'PAID', 'DELIVERY', 75000, NOW());
+
+-- 2. payment 더미 데이터
+INSERT INTO payment (trade_id, pay_method, toss_order_id, amount, status, created_at)
+VALUES (LAST_INSERT_ID(), 'CARD', 'test-order-001', 75000, 'PAID', NOW());

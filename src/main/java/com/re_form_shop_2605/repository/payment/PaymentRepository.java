@@ -21,4 +21,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     // 2. 결제 정보 조회
     Optional<Payment> findByTossPaymentKey(String tossPaymentKey);
+
+    // 3. tradeId로 결제 정보 조회
+    Optional<Payment> findByTradeTradeId(Long tradeId);
 }

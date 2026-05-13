@@ -198,4 +198,16 @@ public class PaymentService {
                 payment.getApprovalNo(), payment.getPaidAt()
         );
     }
+
+    // 4. 결제 정보 조회
+    public PaymentResponseDTO getPayment(Long tradeId) {
+        // 1) 해당 거래의 결제 내역이 존재 여부 확인
+        Payment payment = paymentRepository.findByTradeTradeId(tradeId)
+                .orElseThrow(() -> new IllegalArgumentException("getPayment : 해당 거래의 결제 내역이 존재하지 않습니다."));
+
+        // 2) PaymentResponseDTO 반환
+        return new PaymentResponseDTO(payment.getPaymentId(), tradeId,
+                payment.getPayMethod(), payment.getAmount(), payment.getStatus(),
+                payment.getApprovalNo(), payment.getPaidAt());
+    }
 }
