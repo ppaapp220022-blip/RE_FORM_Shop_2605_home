@@ -1,9 +1,3 @@
-/**
- * 작성자: 손민정
- * 작성일: 2026-05-11
- * 설명: 관리자 포인트 관련 기능 구현
- *       - 출금 요청 목록, 출금 승인/반려
- */
 package com.re_form_shop_2605.controller.admin;
 
 import com.re_form_shop_2605.dto.admin.AdminWithdrawActionRequestDTO;
@@ -16,6 +10,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+/**
+ * 작성자: 손민정
+ * 작성일: 2026-05-11
+ * 설명: 관리자 포인트 관련 기능 구현
+ *       - 출금 요청 목록, 출금 승인/반려
+ */
 
 @Log4j2
 @RestController

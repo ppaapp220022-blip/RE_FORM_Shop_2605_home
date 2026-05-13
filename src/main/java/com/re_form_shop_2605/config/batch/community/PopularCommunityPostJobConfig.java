@@ -1,12 +1,3 @@
-/**
- * ─────────────────────────────────────────────────────
- * 작성자: 손민정
- * 작성일: 2026-05-13
- * 설명: 커뮤니티 인기글 집계 배치
- *       - 1시간마다 실행 시간 기준 24시간 이내 게시글 조회
- *       - 결과는 Redis ZSet "popular:posts"에 저장
- * ─────────────────────────────────────────────────────
- */
 package com.re_form_shop_2605.config.batch.community;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,6 +27,16 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+/**
+ * ─────────────────────────────────────────────────────
+ * 작성자: 손민정
+ * 작성일: 2026-05-13
+ * 설명: 커뮤니티 인기글 집계 배치
+ *       - 1시간마다 실행 시간 기준 24시간 이내 게시글 조회
+ *       - 결과는 Redis ZSet "popular:posts"에 저장
+ * ─────────────────────────────────────────────────────
+ */
 
 @Configuration
 @RequiredArgsConstructor

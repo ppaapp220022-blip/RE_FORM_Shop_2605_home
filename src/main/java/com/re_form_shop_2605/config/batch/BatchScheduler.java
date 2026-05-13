@@ -1,12 +1,3 @@
-/**
- * ─────────────────────────────────────────────────────
- * 작성자: 손민정
- * 작성일: 2026-05-13
- * 설명: 배치 스케줄러
- *       - 자동 구매 확정 및 미정산 거래 정산 처리 (매일 새벽 4시)
- *       - 커뮤니티 인기글 집계 (1시간마다)
- * ─────────────────────────────────────────────────────
- */
 package com.re_form_shop_2605.config.batch;
 
 import lombok.RequiredArgsConstructor;
@@ -16,6 +7,16 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+/**
+ * ─────────────────────────────────────────────────────
+ * 작성자: 손민정
+ * 작성일: 2026-05-13
+ * 설명: 배치 스케줄러
+ *       - 자동 구매 확정 및 미정산 거래 정산 처리 (매일 새벽 4시)
+ *       - 커뮤니티 인기글 집계 (1시간마다)
+ * ─────────────────────────────────────────────────────
+ */
 
 @Component
 @RequiredArgsConstructor
