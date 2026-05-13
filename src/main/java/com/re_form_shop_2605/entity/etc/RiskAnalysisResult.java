@@ -22,13 +22,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "risk_analysis_result",
         indexes = {@Index(name = "idx_risk_analysis_target", columnList = "target_type, target_id")})
 public class RiskAnalysisResult extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "risk_id")
     private Long riskId;
 
     @Enumerated(EnumType.STRING)

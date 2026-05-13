@@ -1,13 +1,22 @@
 package com.re_form_shop_2605.dto.chat;
 
+import com.re_form_shop_2605.dto.etc.RiskAnalysisResultDTO;
+
 import java.time.LocalDateTime;
 
-// WebSocket 메시지 및 이력 조회 공통 사용
+/**
+ * ─────────────────────────────────────────────────────
+ * 작성자: 진혜림
+ * 작성일: 2026-05-13
+ * 설명: WebSocket 메시지 DTO
+ * ─────────────────────────────────────────────────────
+ */
 public record ChatMessageDTO(
         Long messageId,
         Long senderId,
         String content,
         String type, // "TEXT" | "IMAGE" | "SYSTEM"
         LocalDateTime createdAt,
-        boolean isRead
+        boolean isRead,
+        RiskAnalysisResultDTO moderation
 ) {}

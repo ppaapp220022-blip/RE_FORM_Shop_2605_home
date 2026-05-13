@@ -473,19 +473,6 @@ CREATE TABLE notification
 -- 23. 위험 탐지 목록
 -- PK : point_id   |  FK : member_id
 -- IDX : target_type + target_id
-<<<<<<<< HEAD:src/main/resources/sql/init.sql
-# CREATE TABLE risk_analysis_result
-# (
-#     risk_id     BIGINT PRIMARY KEY          NOT NULL AUTO_INCREMENT,
-#     target_type ENUM ('POST', 'CHAT')       NOT NULL COMMENT '감지된 대상 분류',
-#     target_id   BIGINT                      NOT NULL COMMENT '대상 ID',
-#     risk_level  ENUM ('LOW', 'MID', 'HIGH') NOT NULL COMMENT '위험 레벨',
-#     reason      TEXT                        NULL COMMENT '탐지 사유',
-#     suggestion  TEXT                        NULL COMMENT '개선 제안',
-#     created_at  DATETIME                    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-#     KEY idx_risk_analysis_target (target_type, target_id)
-# ) ENGINE = InnoDB;
-========
 CREATE TABLE risk_analysis_result
 (
     risk_id     BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -497,4 +484,3 @@ CREATE TABLE risk_analysis_result
     created_at  DATETIME           NOT NULL DEFAULT CURRENT_TIMESTAMP,
     KEY         idx_risk_analysis_target (target_type, target_id)
 ) ENGINE = InnoDB;
->>>>>>>> chat_2nd:src/main/resources/sql/reform_mysql_erd_schema.sql

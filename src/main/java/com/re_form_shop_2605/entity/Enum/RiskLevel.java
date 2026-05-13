@@ -5,5 +5,5 @@ package com.re_form_shop_2605.entity.Enum;
  * 설명:
  */
 public enum RiskLevel {
-    LOW,MID,HIGH
+    LOW, MID, HIGH
 }
