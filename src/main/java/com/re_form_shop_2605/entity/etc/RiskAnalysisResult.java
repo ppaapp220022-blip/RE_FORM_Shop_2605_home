@@ -23,6 +23,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "risk_analysis_result",
+        indexes = {@Index(name = "idx_risk_analysis_target", columnList = "target_type, target_id")})
 public class RiskAnalysisResult extends BaseEntity {
 
     @Id
@@ -32,6 +34,9 @@ public class RiskAnalysisResult extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "target_type", nullable = false)
     private TargetType targetType;
+
+    @Column(name = "target_id", nullable = false)
+    private Long targetId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "risk_level", nullable = false)
