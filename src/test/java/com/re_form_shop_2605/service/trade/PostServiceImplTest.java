@@ -13,6 +13,7 @@ import com.re_form_shop_2605.entity.Enum.PostStatus;
 import com.re_form_shop_2605.entity.Enum.Role;
 import com.re_form_shop_2605.entity.Enum.Sport;
 import com.re_form_shop_2605.entity.member.Member;
+import com.re_form_shop_2605.entity.trade.Post;
 import com.re_form_shop_2605.repository.member.MemberRepository;
 import com.re_form_shop_2605.repository.trade.PostRepository;
 import lombok.extern.log4j.Log4j2;
@@ -40,6 +41,8 @@ class PostServiceImplTest {
     private MemberRepository memberRepository;
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private PostVectorService postVectorService;
 
     @Test
     void addPostTest() {
@@ -164,5 +167,20 @@ class PostServiceImplTest {
             assertThat(response.content().get(0).sport()).isEqualTo(Sport.BASEBALL);
             assertThat(response.content().get(0).seller()).isNotNull();
         }
+    }
+
+    @Test
+    void initPostVectors() {
+        List<Post> posts = postRepository.findAllByStatusNotIn(List.of(PostStatus.DELETED, PostStatus.HIDDEN));
+        log.info("전체 게시글 수: {}", posts.size());
+
+        for (Post post : posts) {
+            try {
+                postVectorService.savePostVector(post);
+            } catch (Exception e) {
+                log.error("벡터 저장 실패 : postId: {} | {}", post.getPostId(), e.getMessage());
+            }
+        }
+        log.info("벡터 저장 완료");
     }
 }

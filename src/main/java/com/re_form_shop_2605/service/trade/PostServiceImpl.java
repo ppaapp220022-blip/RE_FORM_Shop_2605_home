@@ -46,6 +46,7 @@ public class PostServiceImpl implements PostService {
     private final PostImageService postImageService;
     private final ModelMapper modelMapper;
     private final PostMapper postMapper;
+    private final PostVectorService postVectorService;
 
     @Override
     // 판매글을 저장하고, 함께 전달된 이미지를 이미지 폴더에 저장
@@ -84,6 +85,9 @@ public class PostServiceImpl implements PostService {
         }
 
         postImageRepository.saveAll(postImages);
+
+        postVectorService.savePostVector(savedPost); // 벡터 저장 (유사 의미 검색용)
+
         return savedPost.getPostId();
     }
 
@@ -260,9 +264,11 @@ public class PostServiceImpl implements PostService {
     /**
      * 작성자: 손민정
      * 작성일: 2026-05-12
-     * 설명: 거래 매물 게시글 검색 - 키워드/필터/정렬/페이지네이션
+     * 설명: 거래 매물 게시글 검색 - 필터/정렬 페이지네이션
+     *      - 주의! 사용자가 필터 및 정렬 기준을 설정했을 때 나오는 검색 결과
+     *      - 검색어가 포함된 경우는 PostSearchService.search() 이용할 것 (AI 기능 추가)
      */
-    /* 조건에 따른 검색 결과 조회 */
+    /* 필터, 정렬 기준에 따른 검색 결과 조회 */
     @Override
     public PageResponse<PostCardDTO> searchPosts(String keyword, Sport sport, Grade condition, DeliveryType tradeType,
                                                   Integer minPrice, Integer maxPrice, String sort,

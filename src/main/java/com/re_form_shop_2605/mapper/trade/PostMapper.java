@@ -27,6 +27,7 @@ public interface PostMapper {
     // 게시글 상태만 수정
     int updatePostStatus(@Param("postId") Long postId, @Param("status") String status);
 
+
     /* 조건 따른 게시글 조회 */
     // 1. 검색/필터/정렬 조회
     List<PostCardVO> findPostsByCondition(@Param("keyword") String keyword,
@@ -47,4 +48,21 @@ public interface PostMapper {
                              @Param("tradeType") DeliveryType tradeType,
                              @Param("minPrice") Integer minPrice,
                              @Param("maxPrice") Integer maxPrice);
+
+    // 3. postId 통해 게시글 상세 정보 목록 가져오기 (프론트에 보여줄 PostCardDTO 생성용)
+    List<PostCardVO> findPostsByIds(@Param("postIds") List<Long> postIds,
+                                    @Param("memberId") Long memberId,
+                                    @Param("sport") Sport sport,
+                                    @Param("condition") Grade condition,
+                                    @Param("tradeType") DeliveryType tradeType,
+                                    @Param("minPrice") Integer minPrice,
+                                    @Param("maxPrice") Integer maxPrice); // 찜 여부 확인용
+
+    // 4. postId 목록 총 개수 반환 (페이지네이션용)
+    int countPostsByIds(@Param("postIds") List<Long> postIds,
+                        @Param("sport") Sport sport,
+                        @Param("condition") Grade condition,
+                        @Param("tradeType") DeliveryType tradeType,
+                        @Param("minPrice") Integer minPrice,
+                        @Param("maxPrice") Integer maxPrice);
 }

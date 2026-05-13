@@ -9,9 +9,12 @@ import com.re_form_shop_2605.dto.trade.PostUpdateFormDTO;
 import com.re_form_shop_2605.entity.Enum.DeliveryType;
 import com.re_form_shop_2605.entity.Enum.Grade;
 import com.re_form_shop_2605.entity.Enum.Sport;
+import com.re_form_shop_2605.service.trade.PostSearchService;
 import com.re_form_shop_2605.service.trade.PostService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,25 +22,23 @@ import org.springframework.web.bind.annotation.*;
 
 // 판매글 작성, 조회, 수정, 삭제 API
 @RestController
+@Tag(name = "판매글 게시물 API", description = "")
 @RequestMapping("/api/listings")
+@RequiredArgsConstructor
 public class PostController {
-
     private final PostService postService;
-
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
+    private final PostSearchService postSearchService;
 
     /**
      * 작성자: 손민정
-     * 작성일: 2026-05-12
-     * 설명: 거래 매물 게시글 검색 - 키워드/필터/정렬/페이지네이션
+     * 작성일: 2026-05-13
+     * 설명: 판매글 게시글 검색
+     *      - 필터/정렬 페이지네이션
+     *      - 키워드 의미 기반 유사 상품 검색 페이지네이션
      */
-    // GET /api/listings
-    // 판매글 목록을 페이지 단위로 조회
     @Operation(
-            summary = "판매글 목록 조회",
-            description = "스포츠 종목, 키워드, 거래 방식, 페이지 정보를 기준으로 판매글 목록을 조회합니다."
+            summary = "판매글 검색 및 목록 조회",
+            description = "키워드 제외 searchPosts, 키워드 포함 search 사용해 유사 의미 검색 결과 반환 구현"
     )
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<PostCardDTO>>> readListings(
@@ -53,7 +54,18 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size
     ) {
 //        return ResponseEntity.ok(ApiResponse.ok(postService.readAllPosts(memberId, page, size), "판매글 목록 조회 완료"));
-        return ResponseEntity.ok(ApiResponse.ok(postService.searchPosts(keyword, sport, condition, tradeType, minPrice, maxPrice, sort, page, size, memberId),
+        PageResponse<PostCardDTO> response;
+
+        if (keyword != null && !keyword.isBlank()) {
+            // 1) 키워드가 있을 경우, AI 통한 유사 의미 검색 + 일반 검색
+            response = postSearchService.search(
+                    keyword, sport, condition, tradeType, minPrice, maxPrice, sort, page, size, memberId);
+        } else {
+            // 2) 키워드가 없을 경우, 필터/정렬 적용한 일반 검색
+            response = postService.searchPosts(
+                    null, sport, condition, tradeType, minPrice, maxPrice, sort, page, size, memberId);
+        }
+        return ResponseEntity.ok(ApiResponse.ok(response,
                 "판매글 목록 조회 완료"));
     }
 
