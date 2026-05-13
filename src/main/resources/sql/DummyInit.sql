@@ -653,3 +653,76 @@ FROM (
          SELECT 79, 'Nongshim RedForce', '실착급 윈드브레이커', 'S', '105', false, 110000, 'DELIVERY', '농심 정품 자켓.' UNION ALL
          SELECT 80, 'T1', '2026 월즈 응원 머플러', 'S', 'FREE', false, 35000, 'BOTH', '유니폼과 세트인 머플러.'
      ) AS d;
+
+
+-- 인기글 집계 Batch 테스트용 community_post 더미 데이터
+INSERT INTO community_post (
+    member_id, sport_category, team_category, comm_title, comm_content,
+    comm_view_count, like_count, comment_count, status, created_at
+)
+SELECT
+    (SELECT member_id FROM member ORDER BY RAND() LIMIT 1),
+    d.sport_category, d.team_category, d.comm_title, d.comm_content,
+    d.view_count, d.like_count, d.comment_count, 'ACTIVE',
+    d.random_date
+FROM (
+         -- BASEBALL (10개)
+         SELECT 'BASEBALL' AS sport_category, 'LG 트윈스' AS team_category, '오늘 엘지 타격 실화냐?' AS comm_title, '1회부터 홈런 터지는데 오늘 무조건 이길듯ㅋㅋ' AS comm_content, 450 AS view_count, 80 AS like_count, 45 AS comment_count, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) AS random_date UNION ALL
+         SELECT 'BASEBALL', 'SSG 랜더스', '문학 직관 중인데 날씨 좋네요', '응원 열기 장난 아님. 역시 문학 구장이 최고임.' , 120, 15, 8, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASEBALL', 'KIA 타이거즈', '기아 불펜진 보강 시급함', '매번 8회에 뒤집히는 거 실화? 투수진 좀 갈아치우자.', 380, 55, 30, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASEBALL', '삼성 라이온즈', '라팍 먹거리 추천 좀요', '오늘 처음 가는데 뭐가 제일 맛있나요?', 80, 5, 12, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASEBALL', '두산 베어스', '잠실 더비 예매 성공!', '드디어 직관 간다. 두산 가즈아!', 200, 30, 10, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASEBALL', '롯데 자이언츠', '사직구장 응원가 중독성 대박', '하루 종일 귓가에 맴돌아요 ㅋㅋㅋ', 150, 40, 20, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASEBALL', '한화 이글스', '오늘도 행복수비 중인 한화', '그래도 사랑한다 한화야... 지지는 말자.', 480, 95, 50, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASEBALL', 'KT 위즈', '강백호 타격감 살아났네요', '역시 국대 타자. 앞으로 계속 이렇게만 해주길.', 210, 25, 15, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASEBALL', 'NC 다이노스', '엔씨 유니폼 새로 샀어요', '디자인 진짜 잘 뽑은 듯. 대만족!', 60, 12, 3, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASEBALL', '키움 히어로즈', '고척돔 시원해서 좋네요', '여름엔 역시 돔구장이 최고임.', 90, 8, 5, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+
+         -- SOCCER (10개)
+         SELECT 'SOCCER', '토트넘 홋스퍼', '손흥민 오늘 골 넣을까요?', '요즘 폼 좋아서 멀티골 기대해봅니다.', 500, 100, 48, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'SOCCER', 'PSG', '이강인 패스 지렸다...', '방금 전반전 보신 분? 시야 진짜 미쳤네요.', 420, 85, 40, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'SOCCER', '전북 현대', '전북 올해는 우승 가능할까요?', '경기력이 예전만 못한 것 같아서 걱정입니다.', 310, 45, 25, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'SOCCER', '울산 HD', '울산 공격진 압도적이네요', 'K리그에서 울산 막을 팀이 있을까 싶음.', 280, 38, 18, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'SOCCER', 'FC 서울', '상암 직관 관중 대박 ㄷㄷ', '린가드 효과인가요? 사람 진짜 많음.', 450, 90, 42, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'SOCCER', '맨체스터 시티', '홀란드 득점력 무섭네요', '기계가 아닐까 의심됨... 벌써 몇 골이야.', 230, 28, 14, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'SOCCER', '리버풀', '클롭 나간 이후로 걱정됨', '팀 컬러가 바뀔까요? 잘 적응해야 할 텐데.', 180, 22, 11, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'SOCCER', '레알 마드리드', '역시 챔스의 왕은 레알임', '위기 상황에서도 결국 이겨버리네.', 350, 70, 35, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'SOCCER', '바이에른 뮌헨', '김민재 수비 안정감 대박', '뮌헨 수비의 핵심임. 오늘도 무실점 가자.', 400, 75, 28, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'SOCCER', '대한민국 국가대표', '북중미 월드컵 예선 티켓 예매 정보', '언제 오픈하는지 아시는 분 공유 좀요.', 110, 10, 6, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+
+         -- BASKETBALL (10개)
+         SELECT 'BASKETBALL', '부산 KCC 이지스', '허웅 오늘도 잘하네요', '인기만큼 실력도 확실한 듯.', 290, 45, 22, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASKETBALL', '서울 SK 나이츠', '김선형 플래시 썬 대박', '속공 상황에서 스피드 여전하네요.', 240, 32, 16, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASKETBALL', '창원 LG 세이커스', '오늘 엘지 수비 그물망이네요', '상대팀 실책 유도하는 거 장난 아님.', 160, 20, 9, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASKETBALL', '수원 KT 소닉붐', '허훈 부상 복귀 환영!', '팀 활력이 달라진 게 눈에 보임.', 210, 25, 13, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASKETBALL', '안양 정관장', '정관장 외국인 용병 선택 잘한 듯', '골밑 장악력이 예전보다 훨씬 좋아졌어요.', 130, 15, 7, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASKETBALL', '골든스테이트 워리어스', '스테픈 커리 3점슛 하이라이트', '이게 사람이 쏘는 건지... 거리 무관 다 들어감.', 460, 98, 45, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASKETBALL', 'LA 레이커스', '르브론 제임스 나이 잊은 활약', '아직도 리그 정상급인 게 소름 돋음.', 380, 60, 29, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASKETBALL', '시카고 불스', '불스 예전 명성 찾았으면', '레트로 유니폼 입고 경기 보는데 뭉클하네요.', 100, 10, 5, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASKETBALL', '댈러스 매버릭스', '돈치치 트리플 더블 ㄷㄷ', '스탯 쌓는 속도가 괴물이네요.', 320, 50, 24, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'BASKETBALL', '서울 삼성 썬더스', '삼성 팬인데 언제쯤 반등할까요', '끝까지 응원하긴 하는데 마음이 아프네요.', 90, 5, 20, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+
+         -- VOLLEYBALL (10개)
+         SELECT 'VOLLEYBALL', '흥국생명 핑크스파이더스', '김연경 선수 스파이크 대박', '실제로 보니까 소리가 장난 아니에요.', 470, 92, 47, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'VOLLEYBALL', '현대건설 힐스테이트', '양효진 블로킹 진짜 벽이다', '상대 공격수들 오늘 멘붕 올 듯 ㅋㅋㅋ', 330, 58, 25, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'VOLLEYBALL', '정관장 레드스파크스', '메가 선수 서브 에이스 지렸다', '서브 넣을 때 파워가 압도적임.', 290, 42, 21, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'VOLLEYBALL', '대한항공 점보스', '한선수 세팅 예술이네요', '공격수들 입맛대로 다 올려줌.', 200, 28, 14, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'VOLLEYBALL', '현대캐피탈 스카이워커스', '천안 직관 왔습니다 분위기 짱', '역시 배구의 도시답네요. 응원 소름.', 180, 24, 12, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'VOLLEYBALL', 'GS칼텍스', '민트 군단 화이팅!', '오늘 경기 끈질기게 붙어보자.', 140, 18, 8, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'VOLLEYBALL', '한국도로공사', '도로공사 수비력은 알아줘야 함', '디그 하나하나가 예술이네요.', 110, 15, 6, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'VOLLEYBALL', '삼성화재 블루팡스', '레오 공격 성공률 실화?', '혼자 다 하는 느낌임 ㅋㅋㅋ.', 220, 35, 17, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'VOLLEYBALL', 'IBK기업은행', '기업은행 분위기 반전 성공!', '연패 끊어서 다행이네요. 가즈아.', 105, 12, 5, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'VOLLEYBALL', 'OK금융그룹', '오늘 작전 타임 감독님 열정 대박', '선수들도 자극받아서 잘 뛰는 듯.', 95, 9, 4, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+
+         -- ESPORTS (10개)
+         SELECT 'ESPORTS', 'T1', '페이커 폼 미쳤네요...', '오늘 경기 보셨나요? 무빙이 예술임.', 495, 100, 50, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'ESPORTS', 'Gen.G Esports', '젠지 운영 진짜 소름 돋네', '실수가 아예 없음. 완벽 그 자체.', 430, 88, 38, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'ESPORTS', 'Hanwha Life Esports', '한화 이번 시즌 우승각 잡히나요?', '체급이 진짜 장난 아님.', 340, 65, 33, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'ESPORTS', 'Dplus KIA', '쇼메이커 오늘도 쇼하네요', '플레이메이킹 능력이 아직도 최고임.', 310, 55, 27, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'ESPORTS', 'KT Rolster', '대퍼타임은 이제 옛말?', '오늘 경기 진짜 깔끔하게 이겼음.', 190, 25, 15, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'ESPORTS', 'DRX', '신인들 패기가 장난 아니네요', '보는 맛이 있는 팀인 듯.', 150, 20, 10, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'ESPORTS', 'G2 Esports', 'G2 창의적인 밴픽 보소 ㅋㅋ', '저런 걸 픽할 줄은 몰랐음. 재밌다.', 260, 40, 19, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'ESPORTS', 'Fnatic', '유럽의 자존심 프나틱 가즈아', '국제전에서 사고 한번 쳤으면.', 110, 15, 8, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'ESPORTS', 'Sentinels', '발로란트는 텐즈가 진짜 사기캐', '에임 실화인가요? 화면이 안 보임.', 280, 48, 20, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE) UNION ALL
+         SELECT 'ESPORTS', 'Nongshim RedForce', '농심 육성 능력은 인정해줘야 함', '어린 선수들 성장세가 무섭네요.', 85, 7, 5, DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 1440) MINUTE)
+     ) AS d;
