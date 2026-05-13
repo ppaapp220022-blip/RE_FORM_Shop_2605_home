@@ -33,6 +33,12 @@ public class AdminController {
 
     private final PointService pointService;
 
+    /**
+     * 작성자: 손민정
+     * 작성일: 2026-05-11
+     * 설명: 관리자 포인트 관련 기능 구현
+     *       - 출금 요청 목록, 출금 승인/반려
+     */
     /* 7. 전체 회원 출금 요청 목록 조회 */
     @GetMapping("/withdraw-requests")
     public ResponseEntity<List<WithdrawResponseDTO>> viewAllPendingWithdrawList() {
