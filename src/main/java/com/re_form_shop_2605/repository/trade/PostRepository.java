@@ -12,4 +12,12 @@ import java.util.List;
  */
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByStatusNotIn(List<PostStatus> statuses);
+
+    /**
+     * 작성자: 손민정
+     * 작성일: 2026-05-14
+     * 설명: 미검사 판매 게시물 조회 (위험 탐지 재검사용)
+     */
+    /* 미검사 & 지정 Status가 아닌 게시물 조회 */
+    List<Post> findAllByRiskLevelIsNullAndStatusNotIn(List<PostStatus> statuses);
 }

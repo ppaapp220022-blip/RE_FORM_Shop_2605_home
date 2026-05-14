@@ -2,7 +2,7 @@ package com.re_form_shop_2605.service.trade;
 
 import com.re_form_shop_2605.domain.trade.PostCardVO;
 import com.re_form_shop_2605.dto.common.PageResponse;
-import com.re_form_shop_2605.dto.etc.RiskAnalysisResultDTO;
+import com.re_form_shop_2605.dto.AI.RiskAnalysisResultDTO;
 import com.re_form_shop_2605.dto.trade.PostCardDTO;
 import com.re_form_shop_2605.dto.trade.PostDetailDTO;
 import com.re_form_shop_2605.dto.trade.PostRequestDTO;
@@ -19,14 +19,13 @@ import com.re_form_shop_2605.repository.trade.PostRepository;
 import com.re_form_shop_2605.repository.trade.WishRepository;
 import com.re_form_shop_2605.repository.trade.postImageRepository;
 import com.re_form_shop_2605.service.common.ServicePageResponse;
-import com.re_form_shop_2605.service.etc.ModerationService;
+import com.re_form_shop_2605.service.AI.ModerationService;
 import com.re_form_shop_2605.service.etc.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
