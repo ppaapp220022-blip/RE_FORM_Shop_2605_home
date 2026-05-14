@@ -2,7 +2,7 @@ package com.re_form_shop_2605.controller.chat;
 
 import com.re_form_shop_2605.dto.chat.ChatMessageDTO;
 import com.re_form_shop_2605.dto.chat.ChatSendMessageDTO;
-import com.re_form_shop_2605.dto.etc.RiskAnalysisResultDTO;
+import com.re_form_shop_2605.dto.AI.RiskAnalysisResultDTO;
 import com.re_form_shop_2605.entity.Enum.TargetType;
 import com.re_form_shop_2605.service.chat.ChatService;
 import com.re_form_shop_2605.service.etc.ModerationService;
@@ -11,7 +11,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 

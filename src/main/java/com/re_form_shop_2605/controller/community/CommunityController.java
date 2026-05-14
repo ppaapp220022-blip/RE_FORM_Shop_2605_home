@@ -32,7 +32,7 @@ public class CommunityController {
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<CommunityPostListItemDTO>>> redPosts(
             @RequestParam(required = false) Sport sport,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "15") int size
     ){
         return ResponseEntity.ok(

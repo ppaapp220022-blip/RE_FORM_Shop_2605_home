@@ -1,7 +1,7 @@
 package com.re_form_shop_2605.service.etc;
 
 import com.re_form_shop_2605.dto.common.PageResponse;
-import com.re_form_shop_2605.dto.etc.RiskAnalysisResultDTO;
+import com.re_form_shop_2605.dto.AI.RiskAnalysisResultDTO;
 import com.re_form_shop_2605.entity.Enum.RiskLevel;
 
 /**
