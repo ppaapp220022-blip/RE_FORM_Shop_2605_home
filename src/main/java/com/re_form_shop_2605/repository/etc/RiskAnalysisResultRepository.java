@@ -15,6 +15,7 @@ import java.util.Optional;
  * ─────────────────────────────────────────────────────
  */
 public interface RiskAnalysisResultRepository extends JpaRepository<RiskAnalysisResult, Long> {
+    // 복합 인덱스 활용한 대상 조회
     Optional<RiskAnalysisResult> findByTargetTypeAndTargetId(TargetType targetType, Long targetId);
 
     // (게시글 / 채팅)별 목록 조회
