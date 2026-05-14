@@ -4,6 +4,8 @@ import com.re_form_shop_2605.entity.Enum.RiskLevel;
 import com.re_form_shop_2605.entity.Enum.TargetType;
 import com.re_form_shop_2605.entity.etc.RiskAnalysisResult;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +33,10 @@ public interface RiskAnalysisResultRepository extends JpaRepository<RiskAnalysis
      * ─────────────────────────────────────────────────────
      */
     /* targetType, riskLevel 따른 게시글 조회 */
-    List<RiskAnalysisResult> findByTargetTypeAndRiskLevelOrderByCreatedAtDesc(
-            TargetType targetType, RiskLevel riskLevel
+    @Query("SELECT r FROM RiskAnalysisResult r WHERE r.targetType = :targetType " +
+            "AND r.riskLevel IN :riskLevel ORDER BY r.createdAt DESC")
+    List<RiskAnalysisResult> findByTargetTypeAndRiskLevelIn(
+            @Param("targetType") TargetType targetType,
+            @Param("riskLevel") List<RiskLevel> riskLevel
     );
 }
