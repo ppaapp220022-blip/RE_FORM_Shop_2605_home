@@ -41,7 +41,7 @@ public class CommunityController {
     public ResponseEntity<ApiResponse<PageResponse<CommunityPostListItemDTO>>> redPosts(
             @RequestParam(required = false) Sport sport,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "15") int size
+            @RequestParam(defaultValue = "10") int size
     ){
         return ResponseEntity.ok(
                 ApiResponse.ok(communityService.readPosts(sport, page, size), "게시글 목록 조회 완료")
