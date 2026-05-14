@@ -4,7 +4,7 @@ import com.re_form_shop_2605.dto.common.PageResponse;
 import com.re_form_shop_2605.dto.AI.RiskAnalysisResultDTO;
 import com.re_form_shop_2605.entity.Enum.RiskLevel;
 import com.re_form_shop_2605.entity.Enum.TargetType;
-import com.re_form_shop_2605.entity.etc.RiskAnalysisResult;
+import com.re_form_shop_2605.entity.AI.RiskAnalysisResult;
 import com.re_form_shop_2605.repository.AI.RiskAnalysisResultRepository;
 import com.re_form_shop_2605.service.common.ServicePageResponse;
 import lombok.RequiredArgsConstructor;

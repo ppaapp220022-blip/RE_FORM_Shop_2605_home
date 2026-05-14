@@ -29,6 +29,5 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true);
                 // (선택 사항 추가 가능) 브라우저가 CORS 설정을 캐싱할 시간을 초 단위로 설정
                 // .maxAge(3600);
-
     }
 }
