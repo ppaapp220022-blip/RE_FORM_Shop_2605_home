@@ -8,9 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 /**
- * 작성자: 민기
+ * ─────────────────────────────────────────────────────
+ * 작성자: 김민기
  * 작성일: 2026-05-07
  * 설명: 신고 관련 JPA 리포지토리 인터페이스
+ * ─────────────────────────────────────────────────────
  */
 public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findAllByMember_MemberIdOrderByReportIdDesc(Long reporterId);
@@ -21,4 +23,3 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     long countByTargetTypeAndTargetId(ReportTargetType targetType, Long targetId);
 }
-

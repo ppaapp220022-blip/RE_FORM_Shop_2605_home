@@ -1,7 +1,7 @@
-package com.re_form_shop_2605.repository.etc;
+package com.re_form_shop_2605.repository.AI;
 
 import com.re_form_shop_2605.entity.Enum.TargetType;
-import com.re_form_shop_2605.entity.etc.RiskAnalysisResult;
+import com.re_form_shop_2605.entity.AI.RiskAnalysisResult;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

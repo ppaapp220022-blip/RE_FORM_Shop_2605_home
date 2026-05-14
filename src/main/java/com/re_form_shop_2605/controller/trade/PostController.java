@@ -27,11 +27,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-// 판매글 작성, 조회, 수정, 삭제 API
 /**
- * 작성자: 민기
+ * ─────────────────────────────────────────────────────
+ * 작성자: 김민기
  * 작성일: 2026-05-10
- * 설명: 판매글 조회/작성/수정/삭제와 이미지 업로드, 찜 토글 API를 담당한다.
+ * 설명: 판매글 조회/작성/수정/삭제와 이미지 업로드, 찜 토글 API
+ * ─────────────────────────────────────────────────────
  */
 @RestController
 @Tag(name = "판매글 게시물 API", description = "")
@@ -62,7 +63,7 @@ public class PostController {
             @RequestParam(required = false) Integer minPrice,
             @RequestParam(required = false) Integer maxPrice,
             @RequestParam(defaultValue = "latest") String sort,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Long memberId = principal != null ? principal.getMemberId() : null;
@@ -77,8 +78,7 @@ public class PostController {
             response = postService.searchPosts(
                     null, sport, condition, tradeType, minPrice, maxPrice, sort, page, size, memberId);
         }
-        return ResponseEntity.ok(ApiResponse.ok(response,
-                "판매글 목록 조회 완료"));
+        return ResponseEntity.ok(ApiResponse.ok(response, "판매글 목록 조회 완료"));
     }
 
     // GET /api/listings/{id}
@@ -103,11 +103,6 @@ public class PostController {
             description = "판매글 작성 전에 이미지 파일들을 먼저 업로드하고, 이후 판매글 JSON 본문에 넣을 수 있는 이미지 URL 목록을 반환합니다."
     )
     @PostMapping(value = "/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    /**
-     * 작성자: 다른 작업자
-     * 작성일: 2026-05-10 ~ 2026-05-11
-     * 설명: 판매글 작성 전 이미지를 임시 업로드하고 URL 목록을 반환한다.
-     */
     public ResponseEntity<ApiResponse<ImageUploadResponse>> uploadListingImages(
             @AuthenticationPrincipal MemberSecurityDTO principal,
             @RequestPart("images") List<MultipartFile> images
@@ -124,11 +119,6 @@ public class PostController {
             description = "프론트엔드 명세에 맞춰 판매글 정보와 이미지 URL 목록을 JSON 형식으로 전달받아 새 판매글을 등록합니다."
     )
     @PostMapping
-    /**
-     * 작성자: 다른 작업자
-     * 작성일: 2026-05-10 ~ 2026-05-11
-     * 설명: 판매글을 생성한다.
-     */
     public ResponseEntity<ApiResponse<IdResponse>> addListing(
             @AuthenticationPrincipal MemberSecurityDTO principal,
             @Valid @RequestBody ListingCreateRequestDTO requestDTO
@@ -149,11 +139,6 @@ public class PostController {
             description = "프론트엔드 명세에 맞춰 판매글 ID에 해당하는 게시글의 정보와 이미지 URL 목록을 수정합니다."
     )
     @PatchMapping("/{id}")
-    /**
-     * 작성자: 다른 작업자
-     * 작성일: 2026-05-10 ~ 2026-05-11
-     * 설명: 판매글 정보를 수정한다.
-     */
     public ResponseEntity<ApiResponse<IdResponse>> modifyListing(
             @PathVariable("id") Long postId,
             @AuthenticationPrincipal MemberSecurityDTO principal,
@@ -175,11 +160,6 @@ public class PostController {
             description = "판매글 ID에 해당하는 게시글을 삭제 상태로 변경합니다."
     )
     @DeleteMapping("/{id}")
-    /**
-     * 작성자: 다른 작업자
-     * 작성일: 2026-05-10 ~ 2026-05-11
-     * 설명: 판매글을 삭제 상태로 변경한다.
-     */
     public ResponseEntity<ApiResponse<Void>> removeListing(
             @PathVariable("id") Long postId,
             @AuthenticationPrincipal MemberSecurityDTO principal
@@ -195,11 +175,6 @@ public class PostController {
             description = "현재 회원 기준으로 판매글 찜을 추가 또는 취소하고 최신 찜 상태와 개수를 반환합니다."
     )
     @PostMapping("/{id}/like")
-    /**
-     * 작성자: 민기
-     * 작성일: 2026-05-12
-     * 설명: 현재 회원 기준으로 판매글 찜을 추가 또는 취소한다.
-     */
     public ResponseEntity<ApiResponse<LikeToggleResponse>> toggleListingLike(
             @PathVariable("id") Long postId,
             @AuthenticationPrincipal MemberSecurityDTO principal
@@ -211,17 +186,12 @@ public class PostController {
         ));
     }
 
-    // 생성/수정 응답에서 사용하는 식별자 DTO
     public record IdResponse(Long id) {
     }
 
-    // 이미지 업로드 응답에서 사용하는 URL 목록 DTO
     public record ImageUploadResponse(List<String> urls) {
     }
 
-    // 찜 토글 응답 DTO
     public record LikeToggleResponse(boolean isLiked, long likeCount) {
     }
 }
-
-
