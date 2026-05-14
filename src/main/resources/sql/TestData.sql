@@ -89,3 +89,15 @@ VALUES (1, 2, 1, 'PAID', 'DELIVERY', 75000, NOW());
 -- 2. payment 더미 데이터
 INSERT INTO payment (trade_id, pay_method, toss_order_id, amount, status, created_at)
 VALUES (LAST_INSERT_ID(), 'CARD', 'test-order-001', 75000, 'PAID', NOW());
+
+
+
+-- 위험 탐지 배치 테스트
+INSERT INTO post (seller_id, title, content, sport, team, uniform_name, grade, size, marking, price, delivery_type, status, view_count, wish_count, created_at, updated_at)
+VALUES
+    (1, '유니폼 팝니다', '이 새끼가 사기치면 뒤진다. 조심해라', 'BASEBALL', 'KIA 타이거즈', '2024 홈', 'S', '100', false, 50000, 'DELIVERY', 'ON_SALE', 0, 0, NOW(), NOW()),
+    (2, '유니폼 판매', '특정 지역 출신들은 거래하지 마세요. 다 사기꾼임', 'SOCCER', '토트넘 홋스퍼', '23/24 홈', 'A', '100', false, 80000, 'DELIVERY', 'ON_SALE', 0, 0, NOW(), NOW()),
+    (3, 'LG 유니폼 팝니다', '상태 좋습니다. 착용 2회. 택배 가능합니다.', 'BASEBALL', 'LG 트윈스', '2024 홈', 'S', '95', false, 65000, 'DELIVERY', 'ON_SALE', 0, 0, NOW(), NOW()),
+    (4, '급처합니다', '안 사면 죽여버린다. 개빡치게 하지 말고 빨리 사라', 'BASKETBALL', 'LA 레이커스', '르브론 마킹', 'S', '100', true, 150000, 'DELIVERY', 'ON_SALE', 0, 0, NOW(), NOW()),
+    (5, '삼성 유니폼 급처', '이사 때문에 급하게 팝니다. 가격 협의 가능해요.', 'BASEBALL', '삼성 라이온즈', '구자욱 마킹', 'A', '105', true, 90000, 'BOTH', 'ON_SALE', 0, 0, NOW(), NOW()),
+    (6, '유니폼 ㅍㅍ', 'If you don\'t buy this, I will kill you. Buy it now or else.', 'BASEBALL', '한화 이글스', 'Uniform', 'A', 110, true, 150000, 'DIRECT','ON_SALE', 0, 0, NOW(), now());

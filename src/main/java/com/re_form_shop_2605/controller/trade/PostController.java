@@ -41,6 +41,7 @@ public class PostController {
     private final PostService postService;
     private final PostSearchService postSearchService;
     private final PostImageService postImageService;
+
     /**
      * 작성자: 손민정
      * 작성일: 2026-05-13

@@ -1,11 +1,11 @@
-package com.re_form_shop_2605.service.etc;
+package com.re_form_shop_2605.service.AI;
 
-import com.re_form_shop_2605.dto.etc.RiskAnalysisResultDTO;
+import com.re_form_shop_2605.dto.AI.RiskAnalysisResultDTO;
 import com.re_form_shop_2605.entity.Enum.ModerationCategory;
 import com.re_form_shop_2605.entity.Enum.RiskLevel;
 import com.re_form_shop_2605.entity.Enum.TargetType;
 import com.re_form_shop_2605.entity.etc.RiskAnalysisResult;
-import com.re_form_shop_2605.repository.etc.RiskAnalysisResultRepository;
+import com.re_form_shop_2605.repository.AI.RiskAnalysisResultRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.ai.chat.client.ChatClient;

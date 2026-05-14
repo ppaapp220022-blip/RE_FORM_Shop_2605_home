@@ -64,12 +64,12 @@ INSERT INTO post (
     post_id, seller_id, title, content, sport, team, uniform_name, grade, size,
     marking, price, delivery_type, status, view_count, wish_count, risk_level, created_at, updated_at
 ) VALUES
-    (1, 2, '토트넘 손흥민 홈 유니폼 판매', '실착 1회, 상태 매우 좋습니다.', 'SOCCER', '토트넘 홋스퍼', '2024 홈', 'S', '100', TRUE, 135000, 'DELIVERY', 'ON_SALE', 127, 2, 'LOW', DATE_SUB(NOW(), INTERVAL 20 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY)),
+    (1, 2, '토트넘 손흥민 홈 유니폼 판매', '실착 1회, 상태 매우 좋습니다.', 'SOCCER', '토트넘 홋스퍼', '2024 홈', 'S', '100', TRUE, 135000, 'DELIVERY', 'ON_SALE', 127, 2, NULL, DATE_SUB(NOW(), INTERVAL 20 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY)),
     (2, 2, 'FC서울 레트로 유니폼', '보관만 한 레트로 제품입니다.', 'SOCCER', 'FC 서울', '2013 레트로', 'A', '105', FALSE, 89000, 'BOTH', 'RESERVED', 84, 1, NULL, DATE_SUB(NOW(), INTERVAL 16 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY)),
-    (3, 4, 'LG 트윈스 우승 기념 져지', '우승 시즌 기념판입니다.', 'BASEBALL', 'LG 트윈스', '2023 한국시리즈', 'S', '105', TRUE, 179000, 'DELIVERY', 'SOLD', 233, 3, 'LOW', DATE_SUB(NOW(), INTERVAL 25 DAY), DATE_SUB(NOW(), INTERVAL 8 DAY)),
+    (3, 4, 'LG 트윈스 우승 기념 져지', '우승 시즌 기념판입니다.', 'BASEBALL', 'LG 트윈스', '2023 한국시리즈', 'S', '105', TRUE, 179000, 'DELIVERY', 'SOLD', 233, 3, NULL, DATE_SUB(NOW(), INTERVAL 25 DAY), DATE_SUB(NOW(), INTERVAL 8 DAY)),
     (4, 4, 'KIA 타이거즈 홈 유니폼', '사용감 조금 있습니다.', 'BASEBALL', 'KIA 타이거즈', '2024 홈', 'B', '100', FALSE, 59000, 'DIRECT', 'ON_SALE', 48, 0, NULL, DATE_SUB(NOW(), INTERVAL 11 DAY), DATE_SUB(NOW(), INTERVAL 3 DAY)),
-    (5, 2, '서울 SK 나이츠 챔피언 져지', '사이즈 미스로 판매합니다.', 'BASKETBALL', '서울 SK 나이츠', '챔피언 에디션', 'A', '95', FALSE, 99000, 'DELIVERY', 'HIDDEN', 15, 0, 'MID', DATE_SUB(NOW(), INTERVAL 9 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY)),
-    (6, 8, 'T1 2025 월즈 기념 져지', '미개봉 새상품입니다.', 'ESPORTS', 'T1', '2025 월즈 우승 기념', 'S', '105', TRUE, 249000, 'DELIVERY', 'ON_SALE', 312, 2, 'LOW', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY));
+    (5, 2, '서울 SK 나이츠 챔피언 져지', '사이즈 미스로 판매합니다.', 'BASKETBALL', '서울 SK 나이츠', '챔피언 에디션', 'A', '95', FALSE, 99000, 'DELIVERY', 'HIDDEN', 15, 0, NULL, DATE_SUB(NOW(), INTERVAL 9 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY)),
+    (6, 8, 'T1 2025 월즈 기념 져지', '미개봉 새상품입니다.', 'ESPORTS', 'T1', '2025 월즈 우승 기념', 'S', '105', TRUE, 249000, 'DELIVERY', 'ON_SALE', 312, 2, NULL, DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY));
 
 INSERT INTO post_image (image_id, post_id, image_url, sort_order) VALUES
     (1, 1, 'https://cdn.reform.test/posts/1-1.jpg', 1),

@@ -172,6 +172,15 @@ public class Post extends BaseEntity {
         this.wishCount = Math.max(wishCount, 0);
     }
 
+
+    /**
+     * 작성자: 손민정
+     * 작성일: 2026-05-14
+     * 설명: 배치 작업 중 위험 탐지 기준에 걸린 게시물의 riskLevel 업데이트
+     */
+    public void updateRiskLevel(RiskLevel riskLevel) {
+        this.riskLevel = riskLevel;
+    }
 }
 
 

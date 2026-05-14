@@ -1,6 +1,6 @@
 package com.re_form_shop_2605.dto.chat;
 
-import com.re_form_shop_2605.dto.etc.RiskAnalysisResultDTO;
+import com.re_form_shop_2605.dto.AI.RiskAnalysisResultDTO;
 
 import java.time.LocalDateTime;
 
