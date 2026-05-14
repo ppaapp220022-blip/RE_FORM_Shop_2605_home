@@ -227,7 +227,7 @@ public class ChatService {
                 messagePage.getTotalElements(),
                 messagePage.getTotalPages(),
                 messagePage.getSize(),
-                messagePage.getNumber() + 1,
+                messagePage.getNumber(),
                 messagePage.isFirst(),
                 messagePage.isLast()
         );
