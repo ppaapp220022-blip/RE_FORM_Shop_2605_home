@@ -1,0 +1,33 @@
+# 계좌인증 API 호출 시
+Request
+{
+    "bank_tran_id": "발급된기관코드U123456789",
+    "bank_code_std": "004",
+    "account_num": "1234567890123",
+    "account_holder_info_type": " ",
+    "account_holder_info": "880101",
+    "tran_dtime": "20260514172000"
+}
+
+Response
+{
+    "api_tran_id": "899e19b6-1ccc-412e-8dc9-cc9f70109cdb",
+    "rsp_code": "성공/실패 코드",
+    "rsp_message": "결과 메시지",
+    "api_tran_dtm": "20260515095557447",
+    "bank_tran_id": "은행 거래 ID",
+    "bank_tran_date": "거래 일자",
+    "bank_code_tran": "처리 은행 코드",
+    "bank_rsp_code": "은행 응답 코드",
+    "bank_rsp_message": "은행 응답 메시지",
+    "bank_code_std": "은행 표준 코드",
+    "bank_code_sub": "0000000",
+    "bank_name": "은행명",
+    "account_num": "계좌번호",
+    "account_holder_info_type": "",
+    "account_holder_info": "880101",
+    "account_holder_name": "", // 예금주 성명
+    "account_type": "계좌 종류",
+    "savings_bank_name": "",
+    "account_seq": ""
+}
