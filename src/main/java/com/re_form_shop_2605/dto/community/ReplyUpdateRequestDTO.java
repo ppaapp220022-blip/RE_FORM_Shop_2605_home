@@ -1,16 +1,16 @@
-package com.re_form_shop_2605.dto.chat;
+package com.re_form_shop_2605.dto.community;
 
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * ─────────────────────────────────────────────────────
  * 작성자: 진혜림
- * 작성일: 2026-05-09
- * 설명: 채팅방 생성용 DTO
+ * 작성일: 2026-05-15
+ * 설명: 커뮤니티 게시글 댓글 수정용 DTO
  * ─────────────────────────────────────────────────────
  */
-// POST /api/chats
-public record ChatRoomCreateRequestDTO(
-        @NotNull
-        Long postId // 연결할 판매글 ID
-) {}
+// PUT /api/community/replies/{replyId}
+public class ReplyUpdateRequestDTO {
+    @NotBlank
+    String replyContent;
+}

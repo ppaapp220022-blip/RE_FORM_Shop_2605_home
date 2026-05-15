@@ -1,7 +1,7 @@
 package com.re_form_shop_2605.service.community;
 
 
-import com.re_form_shop_2605.dto.chat.MemberBriefDTO;
+import com.re_form_shop_2605.dto.member.MemberBriefDTO;
 import com.re_form_shop_2605.dto.common.PageResponse;
 import com.re_form_shop_2605.dto.community.*;
 import com.re_form_shop_2605.entity.Enum.CommunityPostStatus;
@@ -233,6 +233,21 @@ public class CommunityServiceImpl implements CommunityService {
         checkAuthor(reply.getMember().getMemberId(), memberId, "댓글 삭제"); // todo 프론트와 상의 본인 댓글이 아닐 시 "권한 없음" 반환
         reply.markAsDeleted(); // 댓글 삭제 (soft delete)
         reply.getCommunityPost().removeComment(); // 커뮤니티 댓글 수 차감
+    }
+
+    /* 댓글 수정 */
+    @Override
+    public ReplyResponseDTO modifyReply(Long replyId, Long memberId, ReplyCreateRequestDTO requestDTO) {
+        Reply reply = getReply(replyId);
+        checkAuthor(reply.getMember().getMemberId(), memberId, "댓글 수정"); // 예외 던지기
+        reply.changeReply(requestDTO.replyContent());
+
+        CommunityPost post = reply.getCommunityPost();
+        Long postAuthorId = post.getMember().getMemberId();
+        List<Reply> topReplies = replyRepository.findAllByCommunityPost_CommIdAndReplyIsNullOrderByCreatedAtDesc(post.getCommId());
+        Map<Long, Integer> anonymousMap = buildAnonymousMap(topReplies, postAuthorId);
+
+        return toReplyResponseDTO(reply, postAuthorId, anonymousMap, memberId);
     }
 
     /* 댓글 좋아요 토글 */
