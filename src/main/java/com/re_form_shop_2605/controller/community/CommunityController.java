@@ -27,7 +27,6 @@ import java.util.List;
  * ─────────────────────────────────────────────────────
  */
 @RestController
-@Tag(name = "커뮤니티 게시판 API", description = "커뮤니티 게시글 작성·수정·삭제·조회 및 인기글 조회 API")
 @RequestMapping("/api/community")
 @RequiredArgsConstructor
 @Tag(name = "커뮤니티 API", description = "커뮤니티 게시글 관련 API")

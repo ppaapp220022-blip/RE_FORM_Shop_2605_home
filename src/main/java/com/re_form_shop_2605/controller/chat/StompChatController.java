@@ -80,7 +80,7 @@ public class StompChatController {
         //
         // 클라이언트 구독 경로: /sub/user/{receiverId}/notification
         // convertAndSendToUser(username, destination, payload) 형태를 쓰면
-        // → 실제 전송 경로는 /sub/user/{username}/notification 이 됨
+        // -> 실제 전송 경로는 /sub/user/{username}/notification 이 됨
         //
         // STOMP 인증 시 Principal의 getName()이 memberId(String)이므로
         // receiver의 memberId를 String으로 변환해서 사용
