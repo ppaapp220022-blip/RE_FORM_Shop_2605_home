@@ -35,7 +35,7 @@ public class StompChatController {
     private final ChatService chatService;
     // 서버 → 클라이언트로 메시지를 능동적으로 보낼 때 사용하는 클래스, 서버가 먼저, 언제든지 특정 경로를 구독 중인 클라이언트에게 메시지를 푸시할 수 있음.
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private ModerationService moderationService;
+    private final ModerationService moderationService;
 
     // 클라이언트가 /pub/chat/message로 보내면 여기서 처리
     @MessageMapping("/chat/message")
@@ -80,7 +80,7 @@ public class StompChatController {
         //
         // 클라이언트 구독 경로: /sub/user/{receiverId}/notification
         // convertAndSendToUser(username, destination, payload) 형태를 쓰면
-        // → 실제 전송 경로는 /sub/user/{username}/notification 이 됨
+        // -> 실제 전송 경로는 /sub/user/{username}/notification 이 됨
         //
         // STOMP 인증 시 Principal의 getName()이 memberId(String)이므로
         // receiver의 memberId를 String으로 변환해서 사용
