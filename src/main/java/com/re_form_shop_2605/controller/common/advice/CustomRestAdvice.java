@@ -81,6 +81,19 @@ public class CustomRestAdvice {
                 .body(ApiResponse.fail("인증 처리에 실패했습니다.", errorsMap));
     }
 
+    // 외부 API 키 미설정, 필수 서비스 초기화 실패 등 서버 설정 문제를 503으로 반환
+    // IllegalArgumentException(400)과 구분: 클라이언트 요청 문제가 아닌 서버 상태 문제
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse<Map<String, String>>> handleIllegalStateException(IllegalStateException ex) {
+        log.error(ex);
+
+        Map<String, String> errorsMap = new HashMap<>();
+        errorsMap.put("message", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ApiResponse.fail("서버 설정 오류가 발생했습니다.", errorsMap));
+    }
+
     // 서비스나 컨트롤러에서 발생한 일반 잘못된 요청 예외를 400으로 반환
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<Map<String, String>>> handleIllegalArgumentException(IllegalArgumentException ex) {

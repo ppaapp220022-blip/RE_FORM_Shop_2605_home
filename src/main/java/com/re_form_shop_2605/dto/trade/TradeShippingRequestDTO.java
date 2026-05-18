@@ -15,6 +15,11 @@ public record TradeShippingRequestDTO(
         @Size(max = 50)
         String courierCode,
 
+        // 택배사 이름 — 프론트에서 이미 보유한 값을 전달받아 외부 API 재호출 방지
+        @NotBlank
+        @Size(max = 100)
+        String courierName,
+
         @NotBlank
         @Size(max = 100)
         String trackingNumber
