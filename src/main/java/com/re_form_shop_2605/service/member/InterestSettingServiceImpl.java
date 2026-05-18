@@ -42,6 +42,7 @@ public class InterestSettingServiceImpl implements InterestSettingService{
 
         InterestSetting mappedInterestSetting = modelMapper.map(onboardingRequestDTO, InterestSetting.class);
         InterestSetting interestSetting = InterestSetting.builder()
+                .memberId(memberId)
                 .member(member)
                 .sport(mappedInterestSetting.getSport())
                 .team(mappedInterestSetting.getTeam())

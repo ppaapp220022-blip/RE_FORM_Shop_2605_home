@@ -1,6 +1,21 @@
 CREATE DATABASE IF NOT EXISTS reform_shop_2605
     DEFAULT CHARACTER SET utf8mb4
     DEFAULT COLLATE utf8mb4_unicode_ci;
+#
+# -- 1. 혹시 모를 기존 유저들 삭제
+# DROP USER IF EXISTS 'admin'@'%';
+# DROP USER IF EXISTS 'admin'@'localhost';
+#
+# -- 2. 유저 생성 (localhost와 % 모두를 위해 각각 생성)
+# CREATE USER 'admin'@'%' IDENTIFIED BY '0507';
+# CREATE USER 'admin'@'localhost' IDENTIFIED BY '0507';
+#
+# -- 3. 데이터베이스 권한 부여
+# GRANT ALL PRIVILEGES ON reform_shop_2605.* TO 'admin'@'%';
+# GRANT ALL PRIVILEGES ON reform_shop_2605.* TO 'admin'@'localhost';
+#
+# -- 4. 변경사항 즉시 반영
+# FLUSH PRIVILEGES;
 
 USE reform_shop_2605;
 
@@ -126,6 +141,7 @@ CREATE TABLE IF NOT EXISTS trade (
     KEY idx_trade_buyer_id (buyer_id),
     KEY idx_trade_seller_id (seller_id),
     KEY idx_trade_status (status),
+    KEY idx_trade_status_received_at (status, received_at),
     CONSTRAINT fk_trade_post
         FOREIGN KEY (post_id) REFERENCES post (post_id),
     CONSTRAINT fk_trade_buyer_member
@@ -161,6 +177,8 @@ CREATE TABLE IF NOT EXISTS chat_room (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '채팅방 생성일',
     PRIMARY KEY (chat_id),
     UNIQUE KEY uk_chat_room_post_buyer (post_id, buyer_id),
+    KEY idx_chat_room_buyer_created_at (buyer_id, created_at),
+    KEY idx_chat_room_post_created_at (post_id, created_at),
     CONSTRAINT fk_chat_room_post
         FOREIGN KEY (post_id) REFERENCES post (post_id),
     CONSTRAINT fk_chat_room_buyer
@@ -178,6 +196,8 @@ CREATE TABLE IF NOT EXISTS chat_message (
     is_read BOOLEAN NOT NULL DEFAULT FALSE COMMENT '읽음 여부',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '메시지 전송 시각',
     PRIMARY KEY (message_id),
+    KEY idx_chat_message_chat_id_created_at (chat_id, created_at),
+    KEY idx_chat_message_chat_id_is_read_sender (chat_id, is_read, sender_id),
     CONSTRAINT fk_chat_message_room
         FOREIGN KEY (chat_id) REFERENCES chat_room (chat_id),
     CONSTRAINT fk_chat_message_sender
