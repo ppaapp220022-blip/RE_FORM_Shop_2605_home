@@ -41,11 +41,11 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final TradeRepository tradeRepository;
     private final TossLogRepository tossLogRepository;
-    private final ObjectMapper objectMapper; // JSON 직렬화용
+    private final ObjectMapper objectMapper;               // JSON 직렬화용
     private final PointWalletRepository pointWalletRepository;
     private final WebClient tossWebClient;
     private final NotificationService notificationService; // 거래 알림 발송용
-    private final ChatService chatService; // 결제 완료 채팅 시스템 메시지용
+    private final ChatService chatService;                 // 결제 완료 채팅 시스템 메시지용
 
     // 1. 결제 요청
     public PaymentInitResponseDTO createPayment(Long buyerId, PaymentInitRequestDTO request) {
