@@ -2,6 +2,7 @@ package com.re_form_shop_2605.controller.draft;
 
 import com.re_form_shop_2605.dto.common.ApiResponse;
 import com.re_form_shop_2605.dto.draft.PostDraftDTO;
+import com.re_form_shop_2605.dto.draft.PostDraftStateDTO;
 import com.re_form_shop_2605.dto.draft.ReplyDraftDTO;
 import com.re_form_shop_2605.dto.login.MemberSecurityDTO;
 import com.re_form_shop_2605.service.draft.DraftService;
@@ -47,12 +48,12 @@ public class DraftController {
             description = "현재 회원이 작성 중인 게시글 초안을 임시 저장합니다."
     )
     @PatchMapping("/posts")
-    public ResponseEntity<ApiResponse<Void>> savePostDraft(
+    public ResponseEntity<ApiResponse<PostDraftStateDTO>> savePostDraft(
             @AuthenticationPrincipal MemberSecurityDTO principal,
             @Valid @RequestBody PostDraftDTO requestDTO
     ) {
-        draftService.savePostDraft(principal.getMemberId(), requestDTO);
-        return ResponseEntity.ok(ApiResponse.ok(null, "게시글 초안 저장 완료"));
+        PostDraftStateDTO response = draftService.savePostDraft(principal.getMemberId(), requestDTO);
+        return ResponseEntity.ok(ApiResponse.ok(response, "게시글 초안 저장 완료"));
     }
 
     // GET /api/drafts/posts
@@ -62,7 +63,7 @@ public class DraftController {
             description = "현재 회원이 저장한 게시글 작성 초안을 조회합니다."
     )
     @GetMapping("/posts")
-    public ResponseEntity<ApiResponse<PostDraftDTO>> readPostDraft(
+    public ResponseEntity<ApiResponse<PostDraftStateDTO>> readPostDraft(
             @AuthenticationPrincipal MemberSecurityDTO principal
     ) {
         return ResponseEntity.ok(ApiResponse.ok(draftService.getPostDraft(principal.getMemberId()), "게시글 초안 조회 완료"));

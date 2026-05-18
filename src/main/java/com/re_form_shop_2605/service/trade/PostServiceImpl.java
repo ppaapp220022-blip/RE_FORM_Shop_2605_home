@@ -98,22 +98,7 @@ public class PostServiceImpl implements PostService {
             postImageRepository.saveAll(postImages);
         }
 
-        /**
-         * ─────────────────────────────────────────────────────
-         * 작성자: 진혜림
-         * 작성일: 2026-05-14
-         * 설명: 게시글 유해성 검사 추가
-         * ─────────────────────────────────────────────────────
-         */
-        // 제목 + 본문 모두 검사
-        // Moderation 실패 시 fallback으로 safe() 반환 (게시글 등록 차단 안함)
-        String contentCheck = postRequestDTO.title() + " " + postRequestDTO.content();
-        RiskAnalysisResultDTO moderation = moderationService.checkAndSave(
-                contentCheck, // 검사할 내용
-                TargetType.POST, // POST / CHAT 항목 분류
-                savedPost.getPostId() // 대상 아이디
-        );
-        log.info("[Post Moderation] postId={}, riskLevel={}", savedPost.getPostId(), moderation.riskLevel());
+        applyPostModeration(savedPost);
 
         return savedPost.getPostId();
     }
@@ -250,6 +235,8 @@ public class PostServiceImpl implements PostService {
                     post.getPrice()
             );
         }
+
+        applyPostModeration(post);
     }
 
     @Override
@@ -300,6 +287,23 @@ public class PostServiceImpl implements PostService {
             return hours + "시간 전";
         }
         return days + "일 전";
+    }
+
+    private void applyPostModeration(Post post) {
+        String contentCheck = buildModerationContent(post.getTitle(), post.getContent());
+        RiskAnalysisResultDTO moderation = moderationService.checkAndSave(
+                contentCheck,
+                TargetType.POST,
+                post.getPostId()
+        );
+        post.updateRiskLevel(moderation.riskLevel());
+        log.info("[Post Moderation] postId={}, riskLevel={}", post.getPostId(), moderation.riskLevel());
+    }
+
+    private String buildModerationContent(String title, String content) {
+        String safeTitle = title == null ? "" : title.trim();
+        String safeContent = content == null ? "" : content.trim();
+        return (safeTitle + " " + safeContent).trim();
     }
 
     // 판매자 엔티티를 요약 DTO로 변환

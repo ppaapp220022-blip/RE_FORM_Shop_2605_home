@@ -101,7 +101,13 @@ public class RiskDetectionJobConfig {
     @Bean
     public ItemProcessor<Post, RiskDetectionResultDTO> riskDetectionProcess() {
         return post -> {
-            RiskAnalysisResultDTO riskAnalysisResultDTO = moderationService.checkAndSave(post.getContent(), TargetType.POST, post.getPostId());
+            String contentToCheck = ((post.getTitle() == null ? "" : post.getTitle().trim()) + " "
+                    + (post.getContent() == null ? "" : post.getContent().trim())).trim();
+            RiskAnalysisResultDTO riskAnalysisResultDTO = moderationService.checkAndSave(
+                    contentToCheck,
+                    TargetType.POST,
+                    post.getPostId()
+            );
 
             return new RiskDetectionResultDTO(post, riskAnalysisResultDTO);
         };

@@ -15,8 +15,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * ─────────────────────────────────────────────────────
@@ -31,6 +34,7 @@ import java.util.Map;
 public class ModerationService {
 
     private final ModerationModel moderationModel;
+    private final ModerationKorean moderationKorean;
     private final ChatClient.Builder chatClientBuilder; // 개선 제안용 ChatGPT
     private final RiskAnalysisResultRepository riskAnalysisResultRepository;
 
@@ -46,75 +50,105 @@ public class ModerationService {
      */
     public RiskAnalysisResultDTO checkAndSave(String content, TargetType targetType, Long targetId) {
         try {
-            // Step 1. Moderation API 호출
-            ModerationPrompt prompt = new ModerationPrompt(content); // "이 텍스트에 문제가 있어?"라고 검사할 내용을 담은 질문지
-            ModerationResponse response = moderationModel.call(prompt); // 응답
-            Moderation moderation = response.getResult().getOutput(); // 응답에서 실제 모더레이션 결과 객체를 꺼냄.
+            log.info("[Moderation] start targetType={}, targetId={}, contentPreview=\"{}\"",
+                    targetType, targetId, preview(content));
 
-            boolean flagged = moderation.getResults().getFirst().isFlagged(); // 유해 콘텐츠로 판정되었는지 여부 (false: 정상 콘텐츠)
-            log.info("[Moderation] flagged={}, targetType={}, targetId={}", flagged, targetType, targetId);
-
-            // Step 2. 정상적인 메시지 -> 즉시 반환 (DB 저장 불필요)
-            if (!flagged) {
-                return RiskAnalysisResultDTO.safe();
+            ModerationKorean.LocalModerationHit localHit = moderationKorean.detect(content);
+            if (localHit != null) {
+                log.info("[Moderation][LocalRule] matched targetType={}, targetId={}, riskLevel={}, reason=\"{}\", normalized=\"{}\"",
+                        targetType, targetId, localHit.riskLevel(), localHit.reason(), localHit.normalizedContent());
+                return persistModerationResult(targetType, targetId, localHit.riskLevel(), localHit.reason(), content);
             }
 
-            // Step 3. 위반 카테고리 분석
-            // Categories 객체를 Map<String, Object>로 변환
-            Categories categories = moderation.getResults().getFirst().getCategories();
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> map = objectMapper.convertValue(categories, new TypeReference<>() {});
+            ModerationDecision decision = evaluate(content, targetType, targetId);
 
-            // true인 카테고리만 필터링 -> ModerationCategory 매핑
-            List<ModerationCategory> matched = new ArrayList<>();
-            map.forEach((key, value) -> {
-                if ((boolean) value) {
-                    ModerationCategory.fromCode(key).ifPresent(category -> {
-                        matched.add(category);
-                        log.info("[Moderation] 위반 카테고리={}", key);
-                    });
-                }
-            });
-
-            // Step 4. 최고 위험 등급 결정
-            // RiskLevel.ordinal() : LOW=0, MID=1, HIGH=2
-            // 가장 높은 ordinal = 가장 심각한 등급
-            RiskLevel maxRiskLevel = matched.stream()
-                    .map(ModerationCategory::getRiskLevel)
-                    .max((a, b) -> a.ordinal() - b.ordinal())
-                    .orElse(RiskLevel.LOW); // ModerationCategory enum에 없어도 flagged=true면 todo LOW 상의 (MID로 할지!)
-
-            // Step 5. reason 문자열 생성
-            // 예) "폭력 표현, 위협적인 표현, "
-            String reason = matched.stream()
-                    .map(ModerationCategory::getMessage)
-                    .reduce("", (acc, msg) -> acc + msg + ", ");
-
-            // Step 6. ChatGPT 개선 제안 요청
-            String suggestion = generateSuggestion(content, reason, targetType);
-
-            // Step 7. risk_analysis_result 테이블 저장
-            RiskAnalysisResult saved = riskAnalysisResultRepository.save(
-                    RiskAnalysisResult.builder()
-                            .targetType(targetType)
-                            .targetId(targetId)
-                            .riskLevel(maxRiskLevel)
-                            .reason(reason)
-                            .suggestion(suggestion)
-                            .build()
-            );
-            log.info("[Moderation] DB 저장 완료 riskLevel={}, targetType={}, targetId={}", maxRiskLevel, targetType, targetId);
-
-            // Step 8. RiskAnalysisResultDTO 반환
-            // from()으로 저장된 엔티티를 DTO로 변환
-            // riskId, createdAt 등 DB 생성 값까지 포함됨
-            return RiskAnalysisResultDTO.from(saved);
+            if (!decision.flagged()) {
+                clearExistingModerationResult(targetType, targetId);
+                return RiskAnalysisResultDTO.safe();
+            }
+            return persistModerationResult(targetType, targetId, decision.riskLevel(), decision.reason(), content);
 
         } catch (Exception e) {
             // fallback API 장애 시 -> 정상 처리
             log.error("[Moderation] API 호출 실패 -> fallback: {}", e.getMessage());
             return RiskAnalysisResultDTO.safe();
         }
+    }
+
+    public RiskAnalysisResultDTO checkDraft(String content, TargetType targetType) {
+        try {
+            log.info("[Draft Moderation] start targetType={}, contentPreview=\"{}\"",
+                    targetType, preview(content));
+
+            ModerationKorean.LocalModerationHit localHit = moderationKorean.detect(content);
+            if (localHit != null) {
+                log.info("[Draft Moderation][LocalRule] matched targetType={}, riskLevel={}, reason=\"{}\", normalized=\"{}\"",
+                        targetType, localHit.riskLevel(), localHit.reason(), localHit.normalizedContent());
+                return buildTransientModerationResult(targetType, localHit.riskLevel(), localHit.reason(), content);
+            }
+
+            ModerationDecision decision = evaluate(content, targetType, null);
+
+            if (!decision.flagged()) {
+                return RiskAnalysisResultDTO.safe();
+            }
+
+            return buildTransientModerationResult(targetType, decision.riskLevel(), decision.reason(), content);
+        } catch (Exception e) {
+            log.error("[Draft Moderation] API 호출 실패 -> fallback: {}", e.getMessage());
+            return RiskAnalysisResultDTO.safe();
+        }
+    }
+
+    private ModerationDecision evaluate(String content, TargetType targetType, Long targetId) {
+        // Step 1. Moderation API 호출
+        ModerationPrompt prompt = new ModerationPrompt(content); // "이 텍스트에 문제가 있어?"라고 검사할 내용을 담은 질문지
+        ModerationResponse response = moderationModel.call(prompt); // 응답
+        Moderation moderation = response.getResult().getOutput(); // 응답에서 실제 모더레이션 결과 객체를 꺼냄.
+
+        boolean flagged = moderation.getResults().getFirst().isFlagged(); // 유해 콘텐츠로 판정되었는지 여부 (false: 정상 콘텐츠)
+        log.info("[Moderation] flagged={}, targetType={}, targetId={}", flagged, targetType, targetId);
+
+        if (!flagged) {
+            return new ModerationDecision(false, null, null);
+        }
+
+        // Step 3. 위반 카테고리 분석
+        Categories categories = moderation.getResults().getFirst().getCategories();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> map = objectMapper.convertValue(categories, new TypeReference<>() {});
+        log.info("[Moderation] rawCategories targetType={}, targetId={} -> {}",
+                targetType, targetId, toBooleanCategoryMap(map));
+
+        List<ModerationCategory> matched = new ArrayList<>();
+        map.forEach((key, value) -> {
+            if (Boolean.TRUE.equals(value)) {
+                ModerationCategory.fromCode(key).ifPresent(category -> {
+                    matched.add(category);
+                    log.info("[Moderation] 위반 카테고리={}", key);
+                });
+            }
+        });
+        log.info("[Moderation] matchedCategories targetType={}, targetId={} -> {}",
+                targetType, targetId, matched.stream()
+                        .map(category -> category.name() + "(" + category.getCode() + "," + category.getRiskLevel() + ")")
+                        .collect(Collectors.toList()));
+
+        RiskLevel maxRiskLevel = matched.stream()
+                .map(ModerationCategory::getRiskLevel)
+                .max((a, b) -> a.ordinal() - b.ordinal())
+                .orElse(RiskLevel.LOW);
+        if (matched.isEmpty()) {
+            log.warn("[Moderation] flagged=true but no categories matched enum mapping. targetType={}, targetId={}, rawCategories={}",
+                    targetType, targetId, toBooleanCategoryMap(map));
+        }
+
+        String reason = matched.stream()
+                .map(ModerationCategory::getMessage)
+                .reduce("", (acc, msg) -> acc + msg + ", ");
+        log.info("[Moderation] decision targetType={}, targetId={}, riskLevel={}, reason=\"{}\"",
+                targetType, targetId, maxRiskLevel, reason);
+        return new ModerationDecision(true, maxRiskLevel, reason);
     }
 
     /**
@@ -151,5 +185,74 @@ public class ModerationService {
             log.error("[Moderation] 개선 제안 생성 실패: {}", e.getMessage());
             return null;
         }
+    }
+
+    private RiskAnalysisResultDTO persistModerationResult(TargetType targetType, Long targetId,
+                                                          RiskLevel riskLevel, String reason, String content) {
+        String suggestion = generateSuggestion(content, reason, targetType);
+
+        Optional<RiskAnalysisResult> existing = riskAnalysisResultRepository.findByTargetTypeAndTargetId(targetType, targetId);
+        RiskAnalysisResult saved;
+
+        if (existing.isPresent()) {
+            RiskAnalysisResult riskAnalysisResult = existing.get();
+            riskAnalysisResult.updateResult(riskLevel, reason, suggestion);
+            saved = riskAnalysisResultRepository.save(riskAnalysisResult);
+            log.info("[Moderation] DB 갱신 완료 riskLevel={}, targetType={}, targetId={}", riskLevel, targetType, targetId);
+        } else {
+            saved = riskAnalysisResultRepository.save(
+                    RiskAnalysisResult.builder()
+                            .targetType(targetType)
+                            .targetId(targetId)
+                            .riskLevel(riskLevel)
+                            .reason(reason)
+                            .suggestion(suggestion)
+                            .build()
+            );
+            log.info("[Moderation] DB 저장 완료 riskLevel={}, targetType={}, targetId={}", riskLevel, targetType, targetId);
+        }
+        return RiskAnalysisResultDTO.from(saved);
+    }
+
+    private RiskAnalysisResultDTO buildTransientModerationResult(TargetType targetType, RiskLevel riskLevel,
+                                                                 String reason, String content) {
+        String suggestion = generateSuggestion(content, reason, targetType);
+        return new RiskAnalysisResultDTO(
+                null,
+                targetType,
+                null,
+                riskLevel,
+                reason,
+                suggestion,
+                null
+        );
+    }
+
+    private void clearExistingModerationResult(TargetType targetType, Long targetId) {
+        riskAnalysisResultRepository.findByTargetTypeAndTargetId(targetType, targetId)
+                .ifPresent(existing -> {
+                    riskAnalysisResultRepository.delete(existing);
+                    log.info("[Moderation] DB 정리 완료 targetType={}, targetId={}", targetType, targetId);
+                });
+    }
+
+    private Map<String, Boolean> toBooleanCategoryMap(Map<String, Object> rawMap) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        rawMap.forEach((key, value) -> result.put(key, Boolean.TRUE.equals(value)));
+        return result;
+    }
+
+    private String preview(String content) {
+        if (content == null) {
+            return "null";
+        }
+        String normalized = content.replaceAll("\\s+", " ").trim();
+        if (normalized.length() <= 80) {
+            return normalized;
+        }
+        return normalized.substring(0, 80) + "...";
+    }
+
+    private record ModerationDecision(boolean flagged, RiskLevel riskLevel, String reason) {
     }
 }

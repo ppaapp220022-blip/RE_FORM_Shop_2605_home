@@ -46,4 +46,10 @@ public class RiskAnalysisResult extends BaseEntity {
 
     @Column(name = "suggestion", columnDefinition = "TEXT")
     private String suggestion; // AI가 생성한 메시지 개선 제안 문구
+
+    public void updateResult(RiskLevel riskLevel, String reason, String suggestion) {
+        this.riskLevel = riskLevel;
+        this.reason = reason;
+        this.suggestion = suggestion;
+    }
 }

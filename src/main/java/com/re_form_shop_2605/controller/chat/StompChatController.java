@@ -40,24 +40,30 @@ public class StompChatController {
     @MessageMapping("/chat/message")
     public void handleMessage(ChatSendMessageDTO chatSendMessageDTO, Principal principal) {
         MemberSecurityDTO member = resolveMember(principal);
-        log.info("Received message: chatId={}, sender={}", chatSendMessageDTO.chatId(), member.getMemberId());
+        ChatSendMessageDTO authenticatedMessage = new ChatSendMessageDTO(
+                chatSendMessageDTO.chatId(),
+                member.getMemberId(),
+                chatSendMessageDTO.content(),
+                chatSendMessageDTO.type()
+        );
+        log.info("Received message: chatId={}, sender={}", authenticatedMessage.chatId(), member.getMemberId());
 
         // 1. 메세지 선저장 (safe 기본값)
         // Moderation 검사에 messageId가 필요하므로 먼저 저장.
-        ChatMessageDTO saved = chatService.saveMessage(chatSendMessageDTO, null);
+        ChatMessageDTO saved = chatService.saveMessage(authenticatedMessage, null);
 
         // 2. MessageType(TEXT / IMAGE / SYSTEM) 중 TEXT 타입만 Moderation 검사
-        if ("TEXT".equalsIgnoreCase(chatSendMessageDTO.type())) {
+        if ("TEXT".equalsIgnoreCase(authenticatedMessage.type())) {
             // CHAT 타입으로 검사 — messageId를 targetId로 전달
             RiskAnalysisResultDTO moderation = moderationService.checkAndSave(
-                    chatSendMessageDTO.content(),
+                    authenticatedMessage.content(),
                     TargetType.CHAT,
                     saved.messageId()
             );
-            log.info("[Moderation] chatId={}, riskLevel={}", chatSendMessageDTO.chatId(), moderation.riskLevel());
+            log.info("[Moderation] chatId={}, riskLevel={}", authenticatedMessage.chatId(), moderation.riskLevel());
 
             // 3. ChatMessageDTO moderation 필드 교체
-            // ChatMessage 엔티티 수정 없음, DTO의 moderation만 실제 검사 결과로 교체해서 전송
+            // 정상 메시지는 moderation=null 로 내려야 프론트가 객체 존재만으로 경고하지 않는다.
             saved = new ChatMessageDTO(
                     saved.messageId(),
                     saved.senderId(),
@@ -65,13 +71,13 @@ public class StompChatController {
                     saved.type(),
                     saved.createdAt(),
                     saved.isRead(),
-                    moderation  // safe() -> 실제 검사 결과로 교체
+                    toFlaggedModeration(moderation)
             );
         }
 
         // 4. 해당 채팅방 구독자에게 전송
         // todo React 클라이언트는 /sub/chat/{chatId} 를 구독하고 있어야 함
-        simpMessagingTemplate.convertAndSend("/sub/chat/" + chatSendMessageDTO.chatId(), saved);
+        simpMessagingTemplate.convertAndSend("/sub/chat/" + authenticatedMessage.chatId(), saved);
 
         // 5. 상대방 개인 구독 경로로 알림 푸시 (실시간 배지 갱신용)
         // chatService.saveMessage 내에서 이미 DB 저장은 완료됨
@@ -84,16 +90,16 @@ public class StompChatController {
         // STOMP 인증 시 Principal의 getName()이 memberId(String)이므로
         // receiver의 memberId를 String으로 변환해서 사용
         Long receiverId = chatService.resolveReceiverId(
-                chatSendMessageDTO.chatId(),
+                authenticatedMessage.chatId(),
                 member.getMemberId()
         );
 
         // 알림 : 클라이언트가 배지 표시에 필요한 최소 정보
         Map<String, Object> notificationPayload = Map.of(
                 "type", "CHAT",                         // 알림 종류
-                "chatId", chatSendMessageDTO.chatId(),  // 채팅방 ID
+                "chatId", authenticatedMessage.chatId(),  // 채팅방 ID
                 "senderNickname", member.getNickname(), // 발신자 닉네임
-                "content", chatSendMessageDTO.content() // 메시지 미리보기
+                "content", authenticatedMessage.content() // 메시지 미리보기
         );
 
         // 수신자 알림 채널로 push — GNB 배지 실시간 갱신용
@@ -106,8 +112,9 @@ public class StompChatController {
 
     // 채팅방 입장 시 읽음 처리
     @MessageMapping("/chat/read")
-    public void handleRead(@Payload ChatReadRequestDTO chatReadRequestDTO) {
-        chatService.markAsRead(chatReadRequestDTO.chatId(), chatReadRequestDTO.myId());
+    public void handleRead(@Payload ChatReadRequestDTO chatReadRequestDTO, Principal principal) {
+        MemberSecurityDTO member = resolveMember(principal);
+        chatService.markAsRead(chatReadRequestDTO.chatId(), member.getMemberId());
     }
 
     private MemberSecurityDTO resolveMember(Principal principal) {
@@ -116,5 +123,9 @@ public class StompChatController {
             return member;
         }
         throw new IllegalArgumentException("STOMP 인증 정보가 없습니다.");
+    }
+
+    private RiskAnalysisResultDTO toFlaggedModeration(RiskAnalysisResultDTO moderation) {
+        return moderation != null && moderation.riskLevel() != null ? moderation : null;
     }
 }
