@@ -1,0 +1,17 @@
+### GET request to example server
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "buyer1@reform.com",
+  "password": "1234"
+}
+
+###
+POST http://localhost:8080/api/auth/login/verify
+Content-Type: application/json
+
+{
+  "challengeId": "a3d15639-5bdc-4985-805c-2430e5cb6e46",
+  "code": "125854"
+}
