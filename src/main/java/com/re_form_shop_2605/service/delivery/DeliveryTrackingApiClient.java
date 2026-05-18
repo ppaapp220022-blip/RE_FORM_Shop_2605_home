@@ -26,9 +26,9 @@ public class DeliveryTrackingApiClient {
 
     // 설정에 저장된 인증 키를 사용해 택배 조회용 WebClient를 구성한다.
     public DeliveryTrackingApiClient(
-            @Value("${deliveryApi.base-url:${deleveryApi.base-url:${deleveryApi.base-url:https://api.deliveryapi.co.kr}}}") String baseUrl,
-            @Value("${deliveryApi.api-key:${deleveryApi.API-Key:${deleveryApi.API-Key:}}}") String apiKey,
-            @Value("${deliveryApi.secret-key:${deleveryApi.Secret-Key:${deleveryApi.Secret-Key:}}}") String secretKey
+            @Value("${delivery-api.base-url:https://api.deliveryapi.co.kr}") String baseUrl,
+            @Value("${delivery-api.api-key:}") String apiKey,
+            @Value("${delivery-api.secret-key:}") String secretKey
     ) {
         this.apiKey = apiKey;
         this.secretKey = secretKey;

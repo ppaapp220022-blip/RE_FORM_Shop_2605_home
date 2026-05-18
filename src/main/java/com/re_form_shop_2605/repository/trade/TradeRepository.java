@@ -54,4 +54,9 @@ public interface TradeRepository extends JpaRepository<Trade, Long> {
     List<Trade> findAllByBuyer_MemberIdOrderByTradeIdDesc(Long buyerId);
 
     List<Trade> findAllBySeller_MemberIdOrderByTradeIdDesc(Long sellerId);
+
+    // status 필터링 쿼리 — readBuyerTrades / readSellerTrades 에서 메모리 필터 대신 DB 레벨 필터에 사용
+    List<Trade> findAllByBuyer_MemberIdAndStatusOrderByTradeIdDesc(Long buyerId, TradeStatus status);
+
+    List<Trade> findAllBySeller_MemberIdAndStatusOrderByTradeIdDesc(Long sellerId, TradeStatus status);
 }

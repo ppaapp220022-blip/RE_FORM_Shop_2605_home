@@ -16,7 +16,13 @@ import java.util.List;
  */
 public record DeliveryTrackingTraceRequestDTO(
         @NotEmpty
-        List<@Valid TraceItemRequestDTO> items
+        List<@Valid TraceItemRequestDTO> items,
+
+        // 배송 진행 이력 포함 여부
+        Boolean includeProgresses,
+
+        // 캐시 무시하고 실시간 조회 여부
+        Boolean skipCache
 ) {
     public record TraceItemRequestDTO(
             @Size(max = 100)

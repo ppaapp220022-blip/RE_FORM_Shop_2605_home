@@ -5,7 +5,6 @@ import com.re_form_shop_2605.dto.delivery.DeliveryTrackingTraceRequestDTO;
 import com.re_form_shop_2605.dto.delivery.DeliveryTrackingTraceResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * ─────────────────────────────────────────────────────
@@ -16,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class DeliveryTrackingServiceImpl implements DeliveryTrackingService {
 
     private final DeliveryTrackingApiClient deliveryTrackingApiClient;

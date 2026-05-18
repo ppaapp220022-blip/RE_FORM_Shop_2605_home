@@ -1,7 +1,6 @@
 package com.re_form_shop_2605.service.trade;
 
 import com.re_form_shop_2605.dto.common.PageResponse;
-import com.re_form_shop_2605.dto.delivery.DeliveryCourierListResponseDTO;
 import com.re_form_shop_2605.dto.delivery.DeliveryTrackingTraceRequestDTO;
 import com.re_form_shop_2605.dto.delivery.DeliveryTrackingTraceResponseDTO;
 import com.re_form_shop_2605.dto.etc.TradeNotificationTemplateDTO;
@@ -134,14 +133,14 @@ public class TradeServiceImpl implements TradeService {
     @Override
     @Transactional(readOnly = true)
     // 구매자 기준 거래 목록을 상태 필터와 함께 페이지 단위로 반환한다.
+    // status != null 이면 DB 레벨에서 필터링하여 불필요한 전체 목록 로드를 방지한다.
     public PageResponse<TradeResponseDTO> readBuyerTrades(Long buyerId, TradeStatus status, int page, int size) {
-        List<Trade> trades = tradeRepository.findAllByBuyer_MemberIdOrderByTradeIdDesc(buyerId);
-        List<TradeResponseDTO> tradeResponseDTOList = new ArrayList<>();
+        List<Trade> trades = (status != null)
+                ? tradeRepository.findAllByBuyer_MemberIdAndStatusOrderByTradeIdDesc(buyerId, status)
+                : tradeRepository.findAllByBuyer_MemberIdOrderByTradeIdDesc(buyerId);
 
+        List<TradeResponseDTO> tradeResponseDTOList = new ArrayList<>();
         for (Trade trade : trades) {
-            if (!matchesTradeStatus(trade, status)) {
-                continue;
-            }
             tradeResponseDTOList.add(mapTradeResponse(trade));
         }
 
@@ -151,14 +150,14 @@ public class TradeServiceImpl implements TradeService {
     @Override
     @Transactional(readOnly = true)
     // 판매자 기준 거래 목록을 상태 필터와 함께 페이지 단위로 반환한다.
+    // status != null 이면 DB 레벨에서 필터링하여 불필요한 전체 목록 로드를 방지한다.
     public PageResponse<TradeResponseDTO> readSellerTrades(Long sellerId, TradeStatus status, int page, int size) {
-        List<Trade> trades = tradeRepository.findAllBySeller_MemberIdOrderByTradeIdDesc(sellerId);
-        List<TradeResponseDTO> tradeResponseDTOList = new ArrayList<>();
+        List<Trade> trades = (status != null)
+                ? tradeRepository.findAllBySeller_MemberIdAndStatusOrderByTradeIdDesc(sellerId, status)
+                : tradeRepository.findAllBySeller_MemberIdOrderByTradeIdDesc(sellerId);
 
+        List<TradeResponseDTO> tradeResponseDTOList = new ArrayList<>();
         for (Trade trade : trades) {
-            if (!matchesTradeStatus(trade, status)) {
-                continue;
-            }
             tradeResponseDTOList.add(mapTradeResponse(trade));
         }
 
@@ -207,6 +206,14 @@ public class TradeServiceImpl implements TradeService {
         // ── 판매자 포인트 정산: pending → withdrawable ──────────────────────────
         // 결제 완료 시 earnPoint()로 pending에 적립된 거래 대금을
         // 구매 확정 시점에 withdrawable(출금 가능)로 전환한다.
+
+        // 중복 정산 방어: PointHistory.trade는 DB unique constraint지만, 동시 요청 시
+        // DataIntegrityViolationException(500)이 노출되는 것을 방지하기 위해 코드 레벨 체크 선행.
+        if (pointHistoryRepository.existsByTrade_TradeId(trade.getTradeId())) {
+            throw new IllegalStateException(
+                    "이미 정산 처리된 거래입니다. (tradeId=" + trade.getTradeId() + ")");
+        }
+
         int tradePrice = trade.getTradePrice();
         PointWallet sellerWallet = pointWalletRepository.findByMemberMemberId(
                 trade.getSeller().getMemberId())
@@ -271,9 +278,10 @@ public class TradeServiceImpl implements TradeService {
             throw new IllegalArgumentException("배송지 정보가 입력된 거래만 배송을 시작할 수 있습니다.");
         }
 
-        String courierName = resolveCourierName(requestDTO.courierCode());
+        // courierName은 프론트(TradePage)에서 이미 보유한 값을 그대로 전달받음
+        // → 배송 시작 시마다 외부 택배사 목록 API를 호출하는 불필요한 I/O 제거
         trade.beginShippingProgress();
-        trade.updateShippingInfo(requestDTO.courierCode(), courierName, requestDTO.trackingNumber());
+        trade.updateShippingInfo(requestDTO.courierCode(), requestDTO.courierName(), requestDTO.trackingNumber());
 
         TradeNotificationTemplateDTO buyerTemplate = notificationService.buildBuyerShippingRegisteredTemplate(
                 trade.getTradeId(),
@@ -290,7 +298,7 @@ public class TradeServiceImpl implements TradeService {
         // 배송 시작 시 채팅방에 안내 메시지
         chatService.sendSystemMessage(
                 trade.getPost().getPostId(), trade.getBuyer().getMemberId(),
-                "[RE:FORM] 판매자가 배송을 시작했습니다. 택배사: " + courierName
+                "[RE:FORM] 판매자가 배송을 시작했습니다. 택배사: " + requestDTO.courierName()
                         + " / 송장번호: " + requestDTO.trackingNumber()
         );
     }
@@ -307,12 +315,17 @@ public class TradeServiceImpl implements TradeService {
             throw new IllegalArgumentException("배송 정보가 아직 입력되지 않았습니다.");
         }
 
+        // DeliveryTrackingTraceRequestDTO(items, includeProgresses, skipCache)
+        // includeProgresses=null → API 기본값 true (진행 이력 포함)
+        // skipCache=null         → API 기본값 false (캐시 사용, 실시간 조회 시 과금 주의)
         DeliveryTrackingTraceRequestDTO requestDTO = new DeliveryTrackingTraceRequestDTO(
                 List.of(new DeliveryTrackingTraceRequestDTO.TraceItemRequestDTO(
                         String.valueOf(trade.getTradeId()),
                         trade.getCourierCode(),
                         trade.getTrackingNumber()
-                ))
+                )),
+                null, // includeProgresses
+                null  // skipCache
         );
         return deliveryTrackingService.trace(requestDTO);
     }
@@ -525,24 +538,5 @@ public class TradeServiceImpl implements TradeService {
         seller.updateMannerScore(mannerScore);
     }
 
-    private String resolveCourierName(String courierCode) {
-        DeliveryCourierListResponseDTO courierListResponseDTO = deliveryTrackingService.readCouriers();
-        if (courierListResponseDTO == null
-                || courierListResponseDTO.data() == null
-                || courierListResponseDTO.data().couriers() == null) {
-            throw new IllegalArgumentException("택배사 목록을 불러오지 못했습니다.");
-        }
-
-        return courierListResponseDTO.data().couriers().stream()
-                .filter(courier -> courierCode.equals(courier.trackingApiCode()))
-                .map(DeliveryCourierListResponseDTO.CourierDTO::displayName)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 택배사 코드입니다."));
-    }
-
-    // 거래 상태가 조회 필터 조건과 일치하는지 확인한다.
-    private boolean matchesTradeStatus(Trade trade, TradeStatus status) {
-        return status == null || trade.getStatus() == status;
-    }
 
 }
