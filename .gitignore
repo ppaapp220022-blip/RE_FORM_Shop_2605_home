@@ -38,3 +38,7 @@ out/
 
 ### env ###
 .env
+
+### 개인 지침 ###
+CLAUDE.md
+.claude
