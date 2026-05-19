@@ -188,6 +188,36 @@ public class TradeServiceImpl implements TradeService {
     }
 
     @Override
+    // 판매자가 REQUESTED 또는 ACCEPTED 상태의 거래를 취소한다.
+    // ACCEPTED 상태였다면 판매글을 ON_SALE로 되돌려 재거래를 가능하게 한다.
+    public void cancelTrade(Long sellerId, Long tradeId) {
+        Trade trade = getTrade(tradeId);
+
+        // 판매자 본인 여부 확인
+        if (!trade.getSeller().getMemberId().equals(sellerId)) {
+            throw new IllegalArgumentException("거래 취소 권한이 없습니다.");
+        }
+
+        // 취소 가능한 상태는 REQUESTED(요청 거절) 또는 ACCEPTED(수락 철회)만 허용
+        if (trade.getStatus() != TradeStatus.REQUESTED && trade.getStatus() != TradeStatus.ACCEPTED) {
+            throw new IllegalArgumentException("구매 요청 또는 수락 상태의 거래만 취소할 수 있습니다.");
+        }
+
+        // ACCEPTED 상태였다면 게시글이 RESERVED로 변경된 상태이므로 ON_SALE로 복구
+        boolean wasAccepted = trade.getStatus() == TradeStatus.ACCEPTED;
+        trade.cancel();
+        if (wasAccepted) {
+            trade.getPost().changeStatus(PostStatus.ON_SALE);
+        }
+
+        // 거래 취소 시 채팅방에 안내 메시지
+        chatService.sendSystemMessage(
+                trade.getPost().getPostId(), trade.getBuyer().getMemberId(),
+                "[RE:FORM] 판매자가 거래를 취소했습니다."
+        );
+    }
+
+    @Override
     // 구매자만 결제 이후 거래를 구매 확정할 수 있게 처리한다.
     public void confirmTrade(Long buyerId, Long tradeId) {
         Trade trade = getTrade(tradeId);
