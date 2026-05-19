@@ -47,7 +47,7 @@ public class PerformanceAspect {
                     .createdAt(System.currentTimeMillis())
                     .build();
 
-            if (executionTime > 0) { // 0ms 초과일때만 Redis에 저장
+            if (executionTime > 100) { // 0ms 초과일때만 Redis에 저장
                 redisTemplate.opsForList().rightPush(logKey, performanceLogDTO);
                 log.info("Redis 저장 시도 key={}, class={}, method={}, time={}ms",
                         logKey, className, methodName, executionTime);
