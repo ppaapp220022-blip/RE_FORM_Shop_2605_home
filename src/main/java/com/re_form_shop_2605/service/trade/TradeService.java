@@ -60,4 +60,7 @@ public interface TradeService {
 
     // 판매자 기준 매너 리뷰 목록 조회
     PageResponse<ReviewResponseDTO> readSellerReviews(Long sellerId, int page, int size);
+
+    // 판매자가 거래를 취소/거절 (REQUESTED 또는 ACCEPTED 상태에서만 가능)
+    void cancelTrade(Long sellerId, Long tradeId);
 }
