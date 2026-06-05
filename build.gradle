@@ -93,5 +93,5 @@ jar {
 }
 
 bootJar {
-    enabled = false // Executable JAR 생성을 비활성화
+    enabled = true // Executable JAR 생성을 비활성화
 }
