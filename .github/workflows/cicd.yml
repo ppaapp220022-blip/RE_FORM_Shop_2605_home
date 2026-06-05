@@ -28,6 +28,9 @@ jobs:
           format: 'YYYY-MM-DDTHH:mm:ss'
           utcOffset: '+09:00'
 
+      - name: List build files
+        run: ls ./build/libs/
+
       - name: Set artifact
         run: echo "artifact=$(ls ./build/libs/*.jar | grep -v plain)" >> $GITHUB_ENV
 
