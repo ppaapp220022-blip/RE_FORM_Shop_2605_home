@@ -1,6 +1,6 @@
 # RE:FORM
 
-[![Java](https://img.shields.io/badge/Java_17-ED8B00?style=flat&logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Java](https://img.shields.io/badge/Java_21-ED8B00?style=flat&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=flat&logo=mariadb&logoColor=white)](https://mariadb.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
@@ -27,11 +27,11 @@
 
 ## 팀원 소개
 
-| 이름 | 기획 | 백엔드 | 비고 |
-|------|------|--------|------|
-| 김민기 | 프로젝트 설계 리딩, 유스케이스 정의, ERD 구성 및 DB 설계 | JWT 인증/인가, OAuth2, 판매글 CRUD, 거래, Delivery API, Redis, Spring AOP 성능 모니터링, AI 위험 탐지 | |
-| 손민정 | 요구사항 정의서, 유스케이스, 테이블 정의서, 스토리보드 | Toss Payments 에스크로 결제, Spring Batch 정산 자동화, OpenAI Embedding + PGVector 의미 검색, AI 위험 탐지, 인기글 집계 | |
-| 진혜림 | 테이블 설계서, 기능 설명서 작성 | WebSocket + STOMP 실시간 채팅, 커뮤니티 CRUD, OpenAI GPT-4o Vision 판매글 이미지 자동 분석, OpenAI Moderation 유해성 검사 | |
+| 이름 | 기획 | 백엔드 | 비고  |
+|------|------|--------|-----|
+| 김민기 | 프로젝트 설계 리딩, 유스케이스 정의, ERD 구성 및 DB 설계 | JWT 인증/인가, OAuth2, 판매글 CRUD, 거래, Delivery API, Redis, Spring AOP 성능 모니터링, AI 위험 탐지 | 백엔드 |
+| 손민정 | 요구사항 정의서, 유스케이스, 테이블 정의서, 스토리보드 | Toss Payments 에스크로 결제, Spring Batch 정산 자동화, OpenAI Embedding + PGVector 의미 검색, AI 위험 탐지, 인기글 집계 | 백엔드 |
+| 진혜림 | 테이블 설계서, 기능 설명서 작성 | WebSocket + STOMP 실시간 채팅, 커뮤니티 CRUD, OpenAI GPT-4o Vision 판매글 이미지 자동 분석, OpenAI Moderation 유해성 검사 | 백엔드 |
 | 최민종 | UI/UX 설계, 디자인 시스템 구축 | React + TypeScript 전체 뷰 개발 전담, Zustand 전역 상태 관리, TanStack Query, 반응형 + 다크모드 | 프론트엔드 |
 
 ---
@@ -83,7 +83,7 @@
 
 ## 시스템 아키텍처
 
-```
+```mermaid
 graph TD
     subgraph Client["Client Layer"]
         FE["React + TypeScript\n(Zustand / TanStack Query)"]
@@ -198,7 +198,7 @@ graph TD
 | MID | 차별/비하, 폭력, 불법 | 관리자 검토 대상 |
 | LOW | 성적 콘텐츠 | riskLevel 업데이트 |
 
-### AI 개인화 추천
+- AI 개인화 추천
 
 > 기존 파일 수정 없이 신규 파일 12개 추가만으로 구현 (AOP 활용)
 
@@ -255,19 +255,66 @@ GET /api/recommendations?size=10
 
 ### Backend
 
-| 항목 | 기술 |
-|------|------|
-| Language | Java 17 |
-| Framework | Spring Boot |
-| ORM | JPA |
-| SQL Mapper | MyBatis |
-| Batch | Spring Batch 6.0.3 |
-| Security | Spring Security + JWT |
+| 항목 | 기술 / 버전 |
+|------|------------|
+| Language | Java 21 |
+| Framework | Spring Boot 4.0.6 |
+| ORM | Spring Data JPA |
+| SQL Mapper | MyBatis 3.0.5 |
+| Batch | Spring Batch |
+| Security | Spring Security + OAuth2 Client |
+| JWT | jjwt 0.12.7 |
 | WebSocket | Spring WebSocket (STOMP) |
-| AI | Spring AI (OpenAI 연동) |
+| AI | Spring AI 2.0.0-M5 (OpenAI 연동) |
 | WebClient | Spring WebFlux |
-| AOP | Spring AOP |
-| API Docs | springdoc-openapi (Swagger UI) |
+| AOP | AspectJ Weaver |
+| API Docs | springdoc-openapi 3.0.3 (Swagger UI) |
+| Object Mapping | ModelMapper 3.2.5 |
+| Lombok | Lombok |
+
+**패키지 구조**
+
+```
+com.re_form_shop_2605/
+├── config/              # 설정 (Security, Redis, Stomp, Swagger, Batch, DB, Payment 등)
+├── controller/          # REST API 엔드포인트
+│   ├── admin/           # 관리자 (회원·게시글·신고·위험탐지·출금 관리)
+│   ├── chat/            # 채팅
+│   ├── community/       # 커뮤니티 게시글·댓글
+│   ├── delivery/        # 배송 조회
+│   ├── draft/           # 임시저장
+│   ├── login/           # 인증 (이메일·OAuth2·JWT)
+│   ├── member/          # 회원·관심설정
+│   ├── payment/         # 결제·포인트·출금
+│   ├── statistics/      # 통계
+│   └── trade/           # 판매글·거래
+├── service/             # 비즈니스 로직
+│   └── AI/              # 추천·위험탐지·임베딩·유해성검사
+├── repository/          # Spring Data JPA Repository
+│   └── AI/              # UserViewLog·UserSearchLog
+├── mapper/              # MyBatis Mapper (복잡 쿼리)
+├── entity/              # JPA 엔티티
+│   ├── chat/            # ChatRoom, ChatMessage
+│   ├── community/       # CommunityPost, Reply, CommunityLike, ReplyLike
+│   ├── etc/             # Notification, Report
+│   ├── member/          # Member, SocialMember, InterestSetting, InterestKeyword
+│   ├── payment/         # Payment, TossLog, PointWallet, PointHistory, PointRequest
+│   ├── trade/           # Post, PostImage, Trade, Wish, MannerReview
+│   ├── AI/              # RiskAnalysisResult
+│   └── Enum/            # 전체 Enum 타입 (Sport, TradeStatus, RiskLevel 등 20+)
+├── dto/                 # 요청·응답 DTO
+├── security/            # JWT 필터·핸들러, OAuth2 UserService
+├── performance/         # AOP 성능 모니터링 (PerformanceAspect)
+└── domain/              # MyBatis용 도메인 객체
+```
+
+**SQL 초기화 파일** (`src/main/resources/sql/`)
+
+| 파일 | 용도 |
+|------|------|
+| `init.sql` | 테이블 DDL 초기화 |
+| `dummy.sql` | 개발용 더미 데이터 |
+| `TestData.sql` | 테스트 데이터 |
 
 ### Database
 
