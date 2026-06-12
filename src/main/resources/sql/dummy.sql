@@ -1,5 +1,3 @@
-USE reform_shop_2605;
-
 SET FOREIGN_KEY_CHECKS = 0;
 
 TRUNCATE TABLE risk_analysis_result;
