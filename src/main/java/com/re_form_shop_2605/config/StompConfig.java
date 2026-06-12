@@ -23,9 +23,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 import java.util.Arrays;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableWebSocketMessageBroker
-@RequiredArgsConstructor
 public class StompConfig implements WebSocketMessageBrokerConfigurer {
     /**
      * ─────────────────────────────────────────────────────
