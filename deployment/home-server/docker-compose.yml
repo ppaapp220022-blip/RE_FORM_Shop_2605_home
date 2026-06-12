@@ -53,8 +53,6 @@ services:
       PGVECTOR_INITIALIZE_SCHEMA: ${PGVECTOR_INITIALIZE_SCHEMA}
     volumes:
       - ${DATA_ROOT}/uploads:/app/uploads
-    ports:
-      - "127.0.0.1:8080:8080"
 
   mariadb:
     image: mariadb:11.4
