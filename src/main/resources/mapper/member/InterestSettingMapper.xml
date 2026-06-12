@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.re_form_shop_2605.mapper.member.InterestSettingMapper">
+<!--    관심 종목 및 구단 등록-->
+    <insert id="insertInterestSetting">
+            INSERT INTO interest_setting (member_id, sport, team)
+            VALUES (#{memberId}, #{sport}, #{team})
+    </insert>
+
+<!--    관심 종목 및 구단 조회-->
+    <select id="findInterestSettingByMemberId" parameterType="java.lang.Long" resultType="com.re_form_shop_2605.domain.member.InterestSettingVO">
+            SELECT * FROM interest_setting WHERE member_id = #{memberId}
+    </select>
+
+<!--    관심 종목 및 구단 수정-->
+    <update id="updateInterestSetting">
+            UPDATE interest_setting
+            SET sport = #{sport},
+                team = #{team}
+            WHERE member_id = #{memberId}
+    </update>
+</mapper>

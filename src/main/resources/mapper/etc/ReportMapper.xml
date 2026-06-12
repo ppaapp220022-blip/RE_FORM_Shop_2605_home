@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.re_form_shop_2605.mapper.etc.ReportMapper">
+
+    <!--    // 신고 등록-->
+    <insert id="insertReport" parameterType="com.re_form_shop_2605.domain.etc.ReportVO"
+            useGeneratedKeys="true" keyProperty="reportId" keyColumn="report_id">
+            INSERT INTO report (reporter_id, target_type, target_id, reason, detail, status)
+            VALUES (#{reporterId}, #{targetType}, #{targetId}, #{reason}, #{detail}, #{status})
+    </insert>
+
+    <!--    // 신고 번호로 단건 조회-->
+    <select id="findReportById" parameterType="java.lang.Long" resultType="com.re_form_shop_2605.domain.etc.ReportVO">
+            SELECT * FROM report WHERE report_id = #{reportId}
+    </select>
+
+    <!--    // 신고자 회원 번호 기준 신고 목록 조회-->
+    <select id="findReportsByReporterId" parameterType="java.lang.Long" resultType="com.re_form_shop_2605.domain.etc.ReportVO">
+            SELECT * FROM report WHERE reporter_id = #{reporterId} ORDER BY report_id DESC
+    </select>
+</mapper>

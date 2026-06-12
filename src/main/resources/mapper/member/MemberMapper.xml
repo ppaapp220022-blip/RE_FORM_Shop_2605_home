@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.re_form_shop_2605.mapper.member.MemberMapper">
+    <!--회원 가입-->
+    <insert id="insertMember" parameterType="com.re_form_shop_2605.domain.member.MemberVO"
+            useGeneratedKeys="true" keyProperty="member_id" keyColumn="member_id">
+            INSERT INTO member (email, password, nickname, profile_image_url, bio, manner_score,
+                                role, status, warning_count, email_event)
+            VALUES (#{email}, #{password}, #{nickname}, #{profileImageUrl}, #{bio}, #{mannerScore},
+                    #{role}, #{status}, #{warningCount}, #{emailEvent})
+    </insert>
+
+    <!--회원 정보 조회-->
+    <select id="findMemberById" parameterType="java.lang.Long" resultType="com.re_form_shop_2605.domain.member.MemberVO">
+        SELECT * FROM member WHERE member_id = #{memberId}
+    </select>
+
+    <!--회원 이메일 조회-->
+    <select id="findMemberByEmail" parameterType="java.lang.String" resultType="com.re_form_shop_2605.domain.member.MemberVO">
+            SELECT * FROM member WHERE email = #{email}
+    </select>
+
+    <!--회원 닉네임 조회-->
+    <select id="findMemberByNickname" parameterType="java.lang.String" resultType="com.re_form_shop_2605.domain.member.MemberVO">
+            SELECT * FROM member WHERE nickname = #{nickname}
+    </select>
+
+    <!--회원 목록-->
+    <select id="findAllMembers" resultType="com.re_form_shop_2605.domain.member.MemberVO">
+            SELECT * FROM member ORDER BY member_id DESC
+    </select>
+
+    <!--회원 정보 수정-->
+    <update id="updateMember" parameterType="com.re_form_shop_2605.domain.member.MemberVO">
+            UPDATE member
+            SET email = #{email},
+                password = #{password},
+                nickname = #{nickname},
+                profile_image_url = #{profileImageUrl},
+                bio = #{bio},
+                manner_score = #{mannerScore},
+                role = #{role},
+                status = #{status},
+                warning_count = #{warningCount},
+                email_event = #{emailEvent}
+            WHERE member_id = #{member_id}
+    </update>
+
+    <!--회원 상태 수정-->
+    <update id="updateMemberStatus">
+            UPDATE member
+            SET status = #{status}
+            WHERE member_id = #{memberId}
+    </update>
+
+    <!--신고 횟수 변경-->
+    <update id="updateWarningCount">
+            UPDATE member
+            SET warning_count = #{warningCount}
+            WHERE member_id = #{memberId}
+    </update>
+
+</mapper>

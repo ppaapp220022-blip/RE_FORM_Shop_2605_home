@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.re_form_shop_2605.mapper.trade.MannerReviewMapper">
+<!--    매너 점수 및 거래 후기 등록-->
+    <insert id="insertMannerReview" parameterType="com.re_form_shop_2605.domain.trade.MannerReviewVO"
+            useGeneratedKeys="true" keyProperty="mannerId" keyColumn="manner_id">
+            INSERT INTO manner_review (trade_id, buyer_id, seller_id, score, content)
+            VALUES (#{tradeId}, #{buyerId}, #{sellerId}, #{score}, #{content})
+    </insert>
+
+    <!--  매너 점수 및 거래 후기 조회-->
+    <select id="findMannerReviewById" parameterType="java.lang.Long" resultType="com.re_form_shop_2605.domain.trade.MannerReviewVO">
+            SELECT * FROM manner_review WHERE manner_id = #{mannerId}
+    </select>
+
+    <!--    판매자 id로 매너 점수 및 거래 후기 조회-->
+    <select id="findMannerReviewByTradeIdAndBuyerId" resultType="com.re_form_shop_2605.domain.trade.MannerReviewVO">
+            SELECT * FROM manner_review WHERE trade_id = #{tradeId} AND buyer_id = #{buyerId}
+    </select>
+
+    <!--    판매자 id 기준 매너 점수 및 거래 후기 목록-->
+    <select id="findMannerReviewsBySellerId" parameterType="java.lang.Long" resultType="com.re_form_shop_2605.domain.trade.MannerReviewVO">
+            SELECT * FROM manner_review WHERE seller_id = #{sellerId} ORDER BY manner_id DESC
+    </select>
+</mapper>
