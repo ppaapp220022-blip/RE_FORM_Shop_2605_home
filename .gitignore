@@ -38,6 +38,8 @@ out/
 
 ### env ###
 .env
+.env.*
+!.env.example
 
 ### 개인 지침 ###
 CLAUDE.md
