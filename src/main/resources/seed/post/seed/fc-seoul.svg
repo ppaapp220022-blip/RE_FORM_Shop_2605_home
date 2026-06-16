@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200">
+  <rect width="1200" height="1200" fill="#111111"/>
+  <rect x="70" y="70" width="1060" height="1060" rx="48" fill="#d71920"/>
+  <rect x="130" y="130" width="940" height="940" rx="32" fill="#1f2f56"/>
+  <text x="600" y="460" text-anchor="middle" font-size="138" font-weight="700" fill="#ffffff">FC SEOUL</text>
+  <text x="600" y="620" text-anchor="middle" font-size="68" fill="#f7d774">2025 HOME KIT</text>
+  <text x="600" y="760" text-anchor="middle" font-size="54" fill="#ffffff">RE_FORM DUMMY SEED</text>
+</svg>

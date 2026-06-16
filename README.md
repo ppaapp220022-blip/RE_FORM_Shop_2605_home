@@ -11,6 +11,10 @@
 
 ---
 
+개인 배포용 링크: https://reform.mkserver.cloud/
+
+---
+
 ## 목차
 
 - [팀원 소개](#팀원-소개)
@@ -24,16 +28,15 @@
 - [팀 회고](#팀-회고)
 - [팀 문서](#팀-문서)
 
----
 
 ## 팀원 소개
 
-| 이름 | 기획 | 역할                                                                                                | 비고  |
-|------|------|---------------------------------------------------------------------------------------------------|-----|
-| 김민기 | 프로젝트 설계 리딩, 유스케이스 정의, ERD 구성 및 DB 설계 | JWT 인증/인가, OAuth2, 판매글 CRUD, 거래, Delivery API, Redis, Spring AOP 성능 모니터링, AI 위험 탐지                | 백엔드 |
-| 손민정 | 요구사항 정의서, 유스케이스, 테이블 정의서, 스토리보드 | Toss Payments 에스크로 결제, Spring Batch 정산 자동화, OpenAI Embedding + PGVector 의미 검색, AI 위험 탐지, 인기글 집계   | 백엔드 |
-| 진혜림 | 테이블 설계서, 기능 설명서 작성 | WebSocket + STOMP 실시간 채팅, 커뮤니티 CRUD, OpenAI GPT-4o Vision 판매글 이미지 자동 분석, OpenAI Moderation 유해성 검사, AI 개인화 추천 (AOP 행동 이력 수집 · Redis → MariaDB 배치 동기화 · PGVector 유사도 검색) | 백엔드 |
-| 최민종 | UI/UX 설계, 디자인 시스템 구축 | React + TypeScript 전체 뷰 개발 전담, Zustand 전역 상태 관리, TanStack Query, 반응형 + 다크모드                       | 프론트엔드 |
+| 이름 | 기획 | 백엔드 | 비고 |
+|------|------|--------|------|
+| 김민기 | 프로젝트 설계 리딩, 유스케이스 정의, ERD 구성 및 DB 설계 | JWT 인증/인가, OAuth2, 판매글 CRUD, 거래, Delivery API, Redis, Spring AOP 성능 모니터링, AI 위험 탐지 | |
+| 손민정 | 요구사항 정의서, 유스케이스, 테이블 정의서, 스토리보드 | Toss Payments 에스크로 결제, Spring Batch 정산 자동화, OpenAI Embedding + PGVector 의미 검색, AI 위험 탐지, 인기글 집계 | |
+| 진혜림 | 테이블 설계서, 기능 설명서 작성 | WebSocket + STOMP 실시간 채팅, 커뮤니티 CRUD, OpenAI GPT-4o Vision 판매글 이미지 자동 분석, OpenAI Moderation 유해성 검사 | |
+| 최민종 | UI/UX 설계, 디자인 시스템 구축 | React + TypeScript 전체 뷰 개발 전담, Zustand 전역 상태 관리, TanStack Query, 반응형 + 다크모드 | 프론트엔드 |
 
 ---
 

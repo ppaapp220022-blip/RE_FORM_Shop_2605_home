@@ -3,6 +3,7 @@ package com.re_form_shop_2605.config;
 import com.re_form_shop_2605.security.JWT.CustomUserDetailsService;
 import com.re_form_shop_2605.security.JWT.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.messaging.Message;
@@ -20,9 +21,10 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-@Configuration
+import java.util.Arrays;
+
+@Configuration(proxyBeanMethods = false)
 @EnableWebSocketMessageBroker
-@RequiredArgsConstructor
 public class StompConfig implements WebSocketMessageBrokerConfigurer {
     /**
      * ─────────────────────────────────────────────────────
@@ -33,13 +35,25 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
      */
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
+    private final String[] allowedOriginPatterns;
+
+    public StompConfig(
+            JwtTokenProvider jwtTokenProvider,
+            CustomUserDetailsService customUserDetailsService,
+            @Value("${app.cors.allowed-origin-patterns:http://localhost:5173}") String allowedOriginPatterns
+    ) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.customUserDetailsService = customUserDetailsService;
+        this.allowedOriginPatterns = Arrays.stream(allowedOriginPatterns.split(","))
+                .map(String::trim)
+                .filter(value -> !value.isEmpty())
+                .toArray(String[]::new);
+    }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        /* 클라이언트가 웹소켓 연결을 시도할 때 사용할 엔드포인트를 등록 */
-        // /stomp/chat: 클라이언트가 접속할 웹소켓 URL
         registry.addEndpoint("/stomp/chat")
-                .setAllowedOriginPatterns("*");
+                .setAllowedOriginPatterns(allowedOriginPatterns);
     }
 
     @Override

@@ -69,10 +69,13 @@ public class PaymentController {
     /* 3. 결제 정보 조회 */
     @Operation(summary = "결제 정보 조회", description = "tradeId로 결제 정보 조회")
     @GetMapping("/{tradeId}")
-    public ResponseEntity<PaymentResponseDTO> viewPayment(@PathVariable Long tradeId) {
+    public ResponseEntity<PaymentResponseDTO> viewPayment(
+            @PathVariable Long tradeId,
+            @AuthenticationPrincipal MemberSecurityDTO principal
+    ) {
         log.info("==== viewPayment 결제 정보 조회 ... ====");
 
-        PaymentResponseDTO payment = paymentService.getPayment(tradeId);
+        PaymentResponseDTO payment = paymentService.getPayment(tradeId, principal.getMemberId());
         return ResponseEntity.ok(payment);
     }
 
@@ -82,11 +85,12 @@ public class PaymentController {
     @PostMapping("/{paymentKey}/cancel")
     public ResponseEntity<PaymentResponseDTO> cancelPayment(
             @PathVariable String paymentKey,
+            @AuthenticationPrincipal MemberSecurityDTO principal,
             @RequestBody PaymentCancelRequestDTO request
     ) {
         log.info("==== cancelPayment 결제 취소 ... ====");
 
-        PaymentResponseDTO response = paymentService.cancelPayment(paymentKey, request);
+        PaymentResponseDTO response = paymentService.cancelPayment(paymentKey, request, principal.getMemberId());
         return ResponseEntity.ok(response);
     }
 }

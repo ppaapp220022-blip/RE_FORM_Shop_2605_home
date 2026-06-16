@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AccountVerificationConfig {
-    @Value("${account.verification.type}")
+    @Value("${account.verification.type:mock}")
     private String type;
 
     @Bean

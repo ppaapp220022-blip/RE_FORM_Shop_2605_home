@@ -54,8 +54,8 @@ public class CommunityServiceImpl implements CommunityService {
         List<CommunityPostStatus> excluded = List.of(CommunityPostStatus.HIDDEN, CommunityPostStatus.DELETED);
 
         List<CommunityPost> posts = (sport == null)
-                ? communityPostRepository.findAllByStatusNotIn(excluded)
-                : communityPostRepository.findAllBySportCategoryAndStatusNotIn(sport, excluded);
+                ? communityPostRepository.findAllByStatusNotInOrderByCreatedAtDesc(excluded)
+                : communityPostRepository.findAllBySportCategoryAndStatusNotInOrderByCreatedAtDesc(sport, excluded);
 
         List<CommunityPostListItemDTO> communityPostListItemDTOS = new ArrayList<>();
         for (CommunityPost post : posts) {

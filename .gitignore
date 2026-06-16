@@ -38,6 +38,8 @@ out/
 
 ### env ###
 .env
+.env.*
+!.env.example
 
 ### 개인 지침 ###
 CLAUDE.md
@@ -45,3 +47,7 @@ CLAUDE.md
 BACKEND_API_HANDOFF_2026-05-14.md
 FRONTEND_API_SPEC.md
 UseCase.md
+
+### local runtime artifacts ###
+/uploads/
+/tmp/

@@ -1,5 +1,3 @@
-USE reform_shop_2605;
-
 SET FOREIGN_KEY_CHECKS = 0;
 
 TRUNCATE TABLE risk_analysis_result;
@@ -121,7 +119,7 @@ INSERT INTO member (
     member_id, email, password, nickname, profile_image_url, bio,
     manner_score, role, status, warning_count, email_event, created_at
 ) VALUES
-    (1, 'admin@reform.com', '$2a$10$Birbp2MlRmeg3fZ614YDLuG/uYx6ZQEFP.gRH6diToCmJPX/WVmQe', '관리자계정', NULL, '대량 더미 데이터 검수용 관리자 계정', 5.00, 'ADMIN', 'ACTIVE', 0, TRUE, DATE_SUB(NOW(), INTERVAL 360 DAY));
+    (1, 'admin@reform.com', '$2a$10$r9J2LsXfNf6TaNCMjevt2OFdaHq1ruCt43Dg0WI3Cx945hLyaS4Om', '관리자계정', NULL, '대량 더미 데이터 검수용 관리자 계정', 5.00, 'ADMIN', 'ACTIVE', 0, TRUE, DATE_SUB(NOW(), INTERVAL 360 DAY));
 
 INSERT INTO member (
     member_id, email, password, nickname, profile_image_url, bio,
@@ -130,7 +128,7 @@ INSERT INTO member (
 SELECT
     s.n + 1 AS member_id,
     CONCAT('user', LPAD(s.n, 3, '0'), '@reform.com') AS email,
-    '$2a$10$Birbp2MlRmeg3fZ614YDLuG/uYx6ZQEFP.gRH6diToCmJPX/WVmQe' AS password,
+    '$2a$10$r9J2LsXfNf6TaNCMjevt2OFdaHq1ruCt43Dg0WI3Cx945hLyaS4Om' AS password,
     CONCAT('리폼회원', LPAD(s.n, 3, '0')) AS nickname,
     NULL AS profile_image_url,
     CONCAT(tc.team, ' 중심으로 수집하는 더미 회원 ', LPAD(s.n, 3, '0')) AS bio,

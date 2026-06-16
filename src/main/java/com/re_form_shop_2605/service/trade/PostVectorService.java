@@ -4,6 +4,7 @@ import com.re_form_shop_2605.entity.trade.Post;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import org.springframework.ai.document.Document;
@@ -20,11 +21,17 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class PostVectorService {
-    private final VectorStore vectorStore;
+    private final ObjectProvider<VectorStore> vectorStoreProvider;
 
     /* 판매글 등록 시 벡터 저장 */
     // 용도 : 게시글 내용 벡터 변환해 PGVector 저장
     public void savePostVector(Post post) {
+        VectorStore vectorStore = vectorStoreProvider.getIfAvailable();
+        if (vectorStore == null) {
+            log.warn("벡터 저장소가 비활성화되어 임베딩 저장을 건너뜁니다. postId={}", post.getPostId());
+            return;
+        }
+
         String content = buildContent(post);
 
         Document document = new Document(
@@ -38,8 +45,12 @@ public class PostVectorService {
                 )
         );
 
-        vectorStore.add(List.of(document));
-        log.info("savePostVector : 벡터 저장소에 저장 완료  |  postId {}", post.getPostId());
+        try {
+            vectorStore.add(List.of(document));
+            log.info("savePostVector : 벡터 저장소에 저장 완료  |  postId {}", post.getPostId());
+        } catch (Exception exception) {
+            log.error("savePostVector : 벡터 저장 실패  |  postId {}", post.getPostId(), exception);
+        }
     }
 
     /* 유사 검색 팀명 별칭 지정 */

@@ -1,0 +1,94 @@
+services:
+  frontend:
+    image: ${FRONTEND_IMAGE}
+    container_name: reform-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+  backend:
+    image: ${BACKEND_IMAGE}
+    container_name: reform-backend
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+      - redis
+      - pgvector
+    environment:
+      APP_PUBLIC_ORIGIN: ${APP_PUBLIC_ORIGIN}
+      APP_CORS_ALLOWED_ORIGIN_PATTERNS: ${APP_CORS_ALLOWED_ORIGIN_PATTERNS}
+      APP_UPLOAD_DIR: /app/uploads
+      MARIADB_URL: jdbc:mariadb://mariadb:3306/${MARIADB_DATABASE}
+      MARIADB_USERNAME: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      POSTGRES_URL: jdbc:postgresql://pgvector:5432/${POSTGRES_DB}
+      POSTGRES_USERNAME: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      SECURITY_JWT_SECRET: ${SECURITY_JWT_SECRET}
+      TOSS_CLIENT_KEY: ${TOSS_CLIENT_KEY}
+      TOSS_SECRET_KEY: ${TOSS_SECRET_KEY}
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID}
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      DELIVERYAPI_API_KEY: ${DELIVERYAPI_API_KEY}
+      DELIVERYAPI_SECRET_KEY: ${DELIVERYAPI_SECRET_KEY}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_APP_PASSWORD: ${MAIL_APP_PASSWORD}
+      APP_MAIL_FROM: ${APP_MAIL_FROM}
+      APP_MAIL_ENABLED: ${APP_MAIL_ENABLED}
+      APP_AUTH_LOGIN_CODE_DELIVERY_MODE: ${APP_AUTH_LOGIN_CODE_DELIVERY_MODE}
+      KAKAO_REDIRECT_URI: ${KAKAO_REDIRECT_URI}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+      APP_AUTH_OAUTH_SUCCESS_REDIRECT_URI: ${APP_AUTH_OAUTH_SUCCESS_REDIRECT_URI}
+      APP_AUTH_OAUTH_FAILURE_REDIRECT_URI: ${APP_AUTH_OAUTH_FAILURE_REDIRECT_URI}
+      SPRING_BATCH_INITIALIZE_SCHEMA: ${SPRING_BATCH_INITIALIZE_SCHEMA}
+      PGVECTOR_INITIALIZE_SCHEMA: ${PGVECTOR_INITIALIZE_SCHEMA}
+      APP_DUMMY_SQL_ENABLED: ${APP_DUMMY_SQL_ENABLED}
+      APP_DUMMY_SQL_FORCE: ${APP_DUMMY_SQL_FORCE}
+    volumes:
+      - ${DATA_ROOT}/uploads:/app/uploads
+
+  mariadb:
+    image: mariadb:11.4
+    container_name: reform-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    volumes:
+      - ${DATA_ROOT}/mariadb:/var/lib/mysql
+    ports:
+      - "127.0.0.1:3306:3306"
+
+  redis:
+    image: redis:7-alpine
+    container_name: reform-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - ${DATA_ROOT}/redis:/data
+    ports:
+      - "127.0.0.1:6379:6379"
+
+  pgvector:
+    image: pgvector/pgvector:pg17
+    container_name: reform-pgvector
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ${DATA_ROOT}/pgvector:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"

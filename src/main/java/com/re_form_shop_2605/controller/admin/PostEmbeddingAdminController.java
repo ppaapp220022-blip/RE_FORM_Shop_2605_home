@@ -6,7 +6,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,11 +26,17 @@ import java.util.Map;
 public class PostEmbeddingAdminController {
 
     private final PostRepository postRepository;
-    private final VectorStore vectorStore;
+    private final ObjectProvider<VectorStore> vectorStoreProvider;
 
     @PostMapping("/admin/embed/posts")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> embedAllExistingPosts() {
+        VectorStore vectorStore = vectorStoreProvider.getIfAvailable();
+        if (vectorStore == null) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body("벡터 스토어가 비활성화되어 임베딩을 실행할 수 없습니다.");
+        }
+
         int page = 0, size = 100, totalEmbedded = 0;
         while (true) {
             List<Post> batch = postRepository.findAll(PageRequest.of(page++, size)).getContent();

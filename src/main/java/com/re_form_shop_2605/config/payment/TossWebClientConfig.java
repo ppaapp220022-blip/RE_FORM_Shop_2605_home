@@ -24,7 +24,7 @@ public class TossWebClientConfig {
       - 토스페이먼츠 API는 시크릿 키를 사용자 ID로 사용하고, 비밀번호는 사용하지 않음
       - 비밀번호가 없다는 것을 알리기 위해 시크릿 키 뒤에 콜론 추가
     */
-    @Value("${toss.secret-key}")
+    @Value("${toss.secret-key:}")
     private String secretKey;
 
     @Bean

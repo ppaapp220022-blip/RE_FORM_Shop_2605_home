@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200">
+  <rect width="1200" height="1200" fill="#f4f7fb"/>
+  <rect x="70" y="70" width="1060" height="1060" rx="48" fill="#132257"/>
+  <circle cx="600" cy="360" r="120" fill="#ffffff"/>
+  <text x="600" y="620" text-anchor="middle" font-size="112" font-weight="700" fill="#ffffff">SPURS</text>
+  <text x="600" y="740" text-anchor="middle" font-size="66" fill="#dfe7ff">24/25 HOME</text>
+  <text x="600" y="840" text-anchor="middle" font-size="52" fill="#ffffff">RE_FORM DUMMY SEED</text>
+</svg>

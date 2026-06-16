@@ -13,6 +13,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -26,9 +27,9 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class PostSearchService {
-    private final VectorStore vectorStore;
     private final PostMapper postMapper;
     private final PostImageService postImageService;
+    private final ObjectProvider<VectorStore> vectorStoreProvider;
 
     /* 검색어 적용 결과 목록 반환 */
     public PageResponse<PostCardDTO> search(String query, Sport sport, Grade condition,
@@ -40,20 +41,29 @@ public class PostSearchService {
 
         // 1) AI 통한 유사 의미 결과 검색
         if (query != null && !query.isBlank()) {
-            List<Document> similaritySearch = vectorStore.similaritySearch(
-                    SearchRequest.builder()
-                            .query(query)
-                            .topK(100)
-                            .similarityThreshold(0.7)
-                            .build());
-            similaritySearch.forEach(result -> {
-                Object postId = result.getMetadata().get("postId");
-                if (postId != null) {
-                    Long id = Long.parseLong(postId.toString());
-                    log.info("AI 검색 결과 postId: {}, score: {}", id, result.getScore());
-                    postIdSet.add(id);
+            VectorStore vectorStore = vectorStoreProvider.getIfAvailable();
+            if (vectorStore == null) {
+                log.warn("벡터 검색이 비활성화되어 키워드 검색만 수행합니다. query={}", query);
+            } else {
+                try {
+                    List<Document> similaritySearch = vectorStore.similaritySearch(
+                            SearchRequest.builder()
+                                    .query(query)
+                                    .topK(100)
+                                    .similarityThreshold(0.7)
+                                    .build());
+                    similaritySearch.forEach(result -> {
+                        Object postId = result.getMetadata().get("postId");
+                        if (postId != null) {
+                            Long id = Long.parseLong(postId.toString());
+                            log.info("AI 검색 결과 postId: {}, score: {}", id, result.getScore());
+                            postIdSet.add(id);
+                        }
+                    });
+                } catch (Exception exception) {
+                    log.error("벡터 검색에 실패해 키워드 검색만 수행합니다. query={}", query, exception);
                 }
-            });
+            }
         }
 
         // 2) 키워드 검색

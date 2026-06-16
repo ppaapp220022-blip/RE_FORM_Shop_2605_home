@@ -83,6 +83,40 @@ public class PostController {
                 "판매글 목록 조회 완료"));
     }
 
+    @Operation(
+            summary = "AI 개인화 추천 목록 조회",
+            description = "로그인 회원에게 우선 인기 게시글 기반 추천 목록을 반환합니다. 비로그인 사용자는 빈 목록을 반환합니다."
+    )
+    @GetMapping("/recommendations")
+    public ResponseEntity<ApiResponse<List<RecommendPostCardDTO>>> readRecommendations(
+            @AuthenticationPrincipal MemberSecurityDTO principal,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        if (principal == null) {
+            return ResponseEntity.ok(ApiResponse.ok(List.of(), "비로그인 추천 목록 조회 완료"));
+        }
+
+        int safeSize = Math.max(1, Math.min(size, 50));
+        PageResponse<PostCardDTO> response = postService.searchPosts(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "popular",
+                1,
+                safeSize,
+                principal.getMemberId()
+        );
+
+        List<RecommendPostCardDTO> content = response.content().stream()
+                .map(item -> RecommendPostCardDTO.from(item, "인기 게시글 기반 추천"))
+                .toList();
+
+        return ResponseEntity.ok(ApiResponse.ok(content, "AI 추천 목록 조회 완료"));
+    }
+
     // GET /api/listings/{id}
     // 판매글 상세 조회
     @Operation(

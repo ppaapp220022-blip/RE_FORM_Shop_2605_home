@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200">
+  <rect width="1200" height="1200" fill="#111111"/>
+  <rect x="90" y="90" width="1020" height="1020" rx="48" fill="#d7a64a"/>
+  <rect x="145" y="145" width="910" height="910" rx="32" fill="#1d1d1d"/>
+  <text x="600" y="470" text-anchor="middle" font-size="148" font-weight="700" fill="#d7a64a">GEN.G</text>
+  <text x="600" y="620" text-anchor="middle" font-size="74" fill="#f7e4b7">LCK 2025</text>
+  <text x="600" y="760" text-anchor="middle" font-size="52" fill="#ffffff">RE_FORM DUMMY SEED</text>
+</svg>

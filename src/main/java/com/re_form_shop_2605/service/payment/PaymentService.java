@@ -200,10 +200,11 @@ public class PaymentService {
     }
 
     // 3-2. 결제 취소 메서드
-    public PaymentResponseDTO cancelPayment(String tossPaymentKey, PaymentCancelRequestDTO request) {
+    public PaymentResponseDTO cancelPayment(String tossPaymentKey, PaymentCancelRequestDTO request, Long requesterId) {
         // 1) tossPaymentKey로 payment 조회
         Payment payment = paymentRepository.findByTossPaymentKey(tossPaymentKey)
                 .orElseThrow(() -> new IllegalArgumentException("cancelPayment : 존재하지 않는 tossPaymentKey 입니다."));
+        validateTradeParticipant(payment.getTrade(), requesterId, "cancelPayment");
 
         // 2) payment 상태 검증 (PAID 상태만 취소 가능)
         if (payment.getStatus() != PaymentStatus.PAID) {
@@ -244,15 +245,17 @@ public class PaymentService {
 
         return cancelPayment(
                 payment.getTossPaymentKey(),
-                new PaymentCancelRequestDTO(cancelReason, "REFUND")
+                new PaymentCancelRequestDTO(cancelReason, "REFUND"),
+                payment.getTrade().getBuyer().getMemberId()
         );
     }
 
     // 4. 결제 정보 조회
-    public PaymentResponseDTO getPayment(Long tradeId) {
+    public PaymentResponseDTO getPayment(Long tradeId, Long requesterId) {
         // 1) 해당 거래의 결제 내역이 존재 여부 확인
         Payment payment = paymentRepository.findByTradeTradeId(tradeId)
                 .orElseThrow(() -> new IllegalArgumentException("getPayment : 해당 거래의 결제 내역이 존재하지 않습니다."));
+        validateTradeParticipant(payment.getTrade(), requesterId, "getPayment");
 
         // 2) PaymentResponseDTO 반환
         return new PaymentResponseDTO(payment.getPaymentId(), tradeId,
@@ -269,6 +272,14 @@ public class PaymentService {
             return objectMapper.writeValueAsString(obj);
         } catch (Exception e) {
             throw new RuntimeException("toss_log JSON 직렬화 실패: " + e.getMessage(), e);
+        }
+    }
+
+    private void validateTradeParticipant(Trade trade, Long requesterId, String action) {
+        boolean isParticipant = trade.getBuyer().getMemberId().equals(requesterId)
+                || trade.getSeller().getMemberId().equals(requesterId);
+        if (!isParticipant) {
+            throw new IllegalArgumentException(action + " : 거래 참여자만 접근할 수 있습니다.");
         }
     }
 }

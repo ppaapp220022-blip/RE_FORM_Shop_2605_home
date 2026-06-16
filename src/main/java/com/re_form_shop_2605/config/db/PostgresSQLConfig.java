@@ -2,7 +2,9 @@ package com.re_form_shop_2605.config.db;
 
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,17 +21,38 @@ import javax.sql.DataSource;
  */
 
 @Configuration
+@ConditionalOnProperty(value = "app.ai.vector.enabled", havingValue = "true", matchIfMissing = true)
 public class PostgresSQLConfig {
+    private final String driverClassName;
+    private final String jdbcUrl;
+    private final String username;
+    private final String password;
+    private final boolean initializeSchema;
+
+    public PostgresSQLConfig(
+            @Value("${spring.datasource.postgres.driver-class-name:org.postgresql.Driver}") String driverClassName,
+            @Value("${spring.datasource.postgres.url:jdbc:postgresql://localhost:5432/reform_vector}") String jdbcUrl,
+            @Value("${spring.datasource.postgres.username:postgres}") String username,
+            @Value("${spring.datasource.postgres.password:postgres}") String password,
+            @Value("${spring.ai.vectorstore.pgvector.initialize-schema:false}") boolean initializeSchema
+    ) {
+        this.driverClassName = driverClassName;
+        this.jdbcUrl = jdbcUrl;
+        this.username = username;
+        this.password = password;
+        this.initializeSchema = initializeSchema;
+    }
+
     /* 벡터 데이터 (AI)
        - spring.datasource.postgres.* 값 읽어옴
-     */
+      */
     @Bean(name = "postgresDataSource")
     public DataSource postgresDataSource() {
         HikariDataSource dataSource = new HikariDataSource();
-        dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setJdbcUrl("jdbc:postgresql://localhost:5432/reform_vector");
-        dataSource.setUsername("postgres");
-        dataSource.setPassword("postgres");
+        dataSource.setDriverClassName(driverClassName);
+        dataSource.setJdbcUrl(jdbcUrl);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
         return dataSource;
     }
 
@@ -37,7 +60,7 @@ public class PostgresSQLConfig {
     public PgVectorStore vectorStore(EmbeddingModel embeddingModel,
                                      @Qualifier("postgresDataSource") DataSource dataSource) {
         return PgVectorStore.builder(new JdbcTemplate(dataSource), embeddingModel)
-                .initializeSchema(true)
+                .initializeSchema(initializeSchema)
                 .build();
     }
 }

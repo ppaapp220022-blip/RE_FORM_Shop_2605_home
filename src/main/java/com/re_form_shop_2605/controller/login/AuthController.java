@@ -137,6 +137,11 @@ public class AuthController {
     )
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<AuthUserDTO>> readMe(@AuthenticationPrincipal MemberSecurityDTO principal) {
+        if (principal == null) {
+            log.info("[AuthController] readMe guest");
+            return ResponseEntity.ok(ApiResponse.ok(null, "비로그인 사용자입니다."));
+        }
+
         // SecurityContext에 담긴 현재 사용자 기준으로 프로필 요약 정보를 반환한다.
         log.info("[AuthController] readMe start memberId={}", principal.getMemberId());
         AuthUserDTO responseDTO = authService.readMe(principal);

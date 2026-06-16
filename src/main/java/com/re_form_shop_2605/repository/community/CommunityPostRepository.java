@@ -33,10 +33,10 @@ public interface CommunityPostRepository extends JpaRepository<CommunityPost, Lo
     );
 
     // 전체 목록 조회 (HIDDEN, DELETED 제외)
-    List<CommunityPost> findAllByStatusNotIn(List<CommunityPostStatus> status);
+    List<CommunityPost> findAllByStatusNotInOrderByCreatedAtDesc(List<CommunityPostStatus> status);
 
     // 종목 필터 목록 조회 (HIDDEN, DELETED 제외)
-    List<CommunityPost> findAllBySportCategoryAndStatusNotIn(
+    List<CommunityPost> findAllBySportCategoryAndStatusNotInOrderByCreatedAtDesc(
             Sport sportCategory,
             List<CommunityPostStatus> statuses
     );

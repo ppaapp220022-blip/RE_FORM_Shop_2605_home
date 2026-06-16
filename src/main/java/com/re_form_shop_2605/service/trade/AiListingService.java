@@ -38,36 +38,40 @@ public class AiListingService {
      * @return AiListingSuggestResponseDTO (title, description)
      */
     public AiListingSuggestResponseDTO suggestFromImage(String contentType, byte[] bytes) {
-        // 1. 시스템 메시지 생성
-        SystemMessage systemMessage = SystemMessage.builder().text("""
-                당신은 중고 스포츠 유니폼 판매 전문가입니다.
-                사용자가 업로드한 상품 이미지를 보고,
-                중고 거래 플랫폼에 올릴 판매글 제목과 설명을 한국어로 작성해주세요.
-                반드시 아래 JSON 형식만 출력하세요.
-                {
-                  "title": "판매글 제목 (20자 이내, 종목·브랜드·사이즈 포함)",
-                  "description": "판매글 설명 (150자 이내, 상태·특징·사이즈 포함)"
-                }
-                """).build();
+        try {
+            // 1. 시스템 메시지 생성
+            SystemMessage systemMessage = SystemMessage.builder().text("""
+                    당신은 중고 스포츠 유니폼 판매 전문가입니다.
+                    사용자가 업로드한 상품 이미지를 보고,
+                    중고 거래 플랫폼에 올릴 판매글 제목과 설명을 한국어로 작성해주세요.
+                    반드시 아래 JSON 형식만 출력하세요.
+                    {
+                      "title": "판매글 제목 (20자 이내, 종목·브랜드·사이즈 포함)",
+                      "description": "판매글 설명 (150자 이내, 상태·특징·사이즈 포함)"
+                    }
+                    """).build();
 
-        // 2. 미디어 생성
-        Media media = Media.builder().mimeType(MimeType.valueOf(contentType)).data(bytes).build();
+            // 2. 미디어 생성
+            Media media = Media.builder().mimeType(MimeType.valueOf(contentType)).data(bytes).build();
 
-        // 3. 유저 메시지 생성
-        UserMessage userMessage = UserMessage.builder().text("이 이미지를 분석해서 판매글 제목과 설명을 JSON으로 작성해주세요.").media(media).build();
+            // 3. 유저 메시지 생성
+            UserMessage userMessage = UserMessage.builder().text("이 이미지를 분석해서 판매글 제목과 설명을 JSON으로 작성해주세요.").media(media).build();
 
-        // 4. 프롬프트 생성
-        Prompt prompt = Prompt.builder().messages(systemMessage, userMessage).build();
+            // 4. 프롬프트 생성
+            Prompt prompt = Prompt.builder().messages(systemMessage, userMessage).build();
 
-        // 5. LLM 호출
-        // 제목/설명은 완성된 JSON을 파싱해야 하므로 .call() 사용
-        String rawJson = chatClient.prompt(prompt)
-                .call()
-                .content();
-        log.info("[AiListingService] AI 원본 응답: {}", rawJson);
+            // 5. LLM 호출
+            String rawJson = chatClient.prompt(prompt)
+                    .call()
+                    .content();
+            log.info("[AiListingService] AI 원본 응답: {}", rawJson);
 
-        // 6. JSON 파싱 후 DTO 반환
-        return parseToDto(rawJson);
+            // 6. JSON 파싱 후 DTO 반환
+            return parseToDto(rawJson);
+        } catch (Exception exception) {
+            log.error("[AiListingService] AI 제안 생성 실패", exception);
+            return AiListingSuggestResponseDTO.fallback();
+        }
     }
 
     /**

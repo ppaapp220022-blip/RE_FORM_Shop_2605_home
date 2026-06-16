@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200">
+  <rect width="1200" height="1200" fill="#242424"/>
+  <rect x="85" y="85" width="1030" height="1030" rx="48" fill="#ff6b00"/>
+  <text x="600" y="470" text-anchor="middle" font-size="120" font-weight="700" fill="#1f1f1f">EAGLES</text>
+  <text x="600" y="620" text-anchor="middle" font-size="72" fill="#fff4e8">2024 HOME</text>
+  <text x="600" y="760" text-anchor="middle" font-size="52" fill="#1f1f1f">RE_FORM DUMMY SEED</text>
+</svg>

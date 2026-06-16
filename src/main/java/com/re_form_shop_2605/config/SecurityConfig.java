@@ -24,6 +24,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 /**
  * ─────────────────────────────────────────────────────
  * 작성자: 김민기
@@ -42,21 +47,24 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${security.jwt.secret}")
+    @Value("${security.jwt.secret:test-jwt-secret}")
     private String jwtSecret;
 
-    @Value("${security.jwt.access-token-expiration-seconds}")
+    @Value("${security.jwt.access-token-expiration-seconds:3600}")
     private long accessTokenExpirationSeconds;
 
-    @Value("${security.jwt.refresh-token-expiration-seconds}")
+    @Value("${security.jwt.refresh-token-expiration-seconds:1209600}")
     private long refreshTokenExpirationSeconds;
 
-    @Value("${app.auth.oauth-success-redirect-uri}")
+    @Value("${app.auth.oauth-success-redirect-uri:http://localhost:5173/oauth/callback}")
     private String oauthSuccessRedirectUri;
 
     // OAuth2 로그인 실패 시 리다이렉트할 프론트엔드 URL
-    @Value("${app.auth.oauth-failure-redirect-uri}")
+    @Value("${app.auth.oauth-failure-redirect-uri:http://localhost:5173/login?error=oauth}")
     private String oauthFailureRedirectUri;
+
+    @Value("${app.cors.allowed-origin-patterns:http://localhost:5173}")
+    private String corsAllowedOriginPatterns;
 
     // 정적 리소스 보안 제외 설정
     @Bean
@@ -96,6 +104,26 @@ public class SecurityConfig {
         return new RestAccessDeniedHandler();
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(
+                Arrays.stream(corsAllowedOriginPatterns.split(","))
+                        .map(String::trim)
+                        .filter(value -> !value.isEmpty())
+                        .toList()
+        );
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.addAllowedHeader("*");
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Set-Cookie"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     // 소셜 로그인 성공시 JWT 발급 후 프론트 콜백으로 리다이렉트 핸들러
     @Bean
     public CustomSocialLoginSuccessHandler customSocialLoginSuccessHandler(
@@ -117,6 +145,7 @@ public class SecurityConfig {
         http
                 // 인증 진입점과 공개 조회 경로만 열고 나머지는 JWT 인증을 요구한다.
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -125,22 +154,28 @@ public class SecurityConfig {
                                 "/api/auth/login/verify",
                                 "/api/auth/register",
                                 "/api/auth/check-nickname",
+                                "/api/auth/me",
                                 "/api/auth/token/refresh",
                                 "/api/auth/password/reset",
                                 "/api/auth/oauth2/**",
                                 "/api/auth/oauth/**",
-                                "/api/community/**",
                                 "/oauth2/**",
                                 "/login/oauth2/**",
                                 "/login/**",
                                 "/stomp/**",
                                 "/api/delivery/tracking/**",
                                 "/uploads/**",
-                                "/confirm",
-                                "/api/community/**",
-                                "/api/payments/**"
+                                "/confirm"
                         ).permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/listings", "/api/listings/**")
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.GET,
+                                "/api/community",
+                                "/api/community/**",
+                                "/api/listings",
+                                "/api/listings/**",
+                                "/api/statistics",
+                                "/api/recommendations"
+                        )
                         .permitAll()
                         .anyRequest().authenticated()
                 )
